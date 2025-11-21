@@ -1,13 +1,8 @@
-
-import './App.css'
+import "./App.css";
+import TasksPage from "./pages/task-page/TaskPage";
 
 function App() {
-
-  return (
-    <>
-    Hello World
-    </>
-  )
+	return <TasksPage />;
 }
 
-export default App
+export default App;
