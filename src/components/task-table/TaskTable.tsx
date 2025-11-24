@@ -7,7 +7,7 @@ import { initialTasks } from "../../mockData/mock-data";
 import { PriorityColor, StatusColor } from "./TaskTable.types";
 import type { Task } from "../../types/types";
 
-export default function TaskTableDataGrid() {
+export default function TaskTable() {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
 
   const addTask = () => {
