@@ -1,15 +1,18 @@
 import { useState } from "react";
 import { Box } from "@mui/material";
 
-import AddTaskModal, { type AddTaskFormValues } from "../../components/modal/AddTaskModal";
+import AddTaskModal from "../../components/modal/AddTaskModal";
 import TaskTable from "../../components/task-table/TaskTable";
+import AppHeader from "../../components/header/AppHeader";
 
 import { initialTasks } from "../../mockData/mock-data";
-import AppHeader from "../../components/header/AppHeader";
+import type { AddTaskFormValues } from "../../components/modal/Modal.types";
+import { useToast } from "../../providers/ToastProvider";
 
 export default function TasksPage() {
   const [open, setOpen] = useState(false);
   const [tasks, setTasks] = useState<any[]>(initialTasks);
+  const { showToast } = useToast();
 
   const handleAddTask = (task: AddTaskFormValues) => {
     setTasks((prev) => [
@@ -24,6 +27,8 @@ export default function TasksPage() {
         status: "In progress"
       }
     ]);
+
+    showToast("Task added successfully", "success");
   };
 
   return (
