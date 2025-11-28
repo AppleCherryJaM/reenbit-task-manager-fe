@@ -1,79 +1,14 @@
-import { useState } from "react";
-import { DataGrid, type GridColDef } from "@mui/x-data-grid";
-import { Box, Chip, Avatar, Button, Stack, Typography } from "@mui/material";
+import { DataGrid } from "@mui/x-data-grid";
+import { Box, Button, Stack, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 
-import { initialTasks } from "../../mockData/mock-data";
 import { PriorityColor, StatusColor } from "./TaskTable.types";
 import type { Task } from "../../types/types";
+import { columns } from "./TaskTable.config";
 
-export default function TaskTable() {
-  const [tasks, setTasks] = useState<Task[]>(initialTasks);
-
-  const addTask = () => {
-		// заглушка (should be replaced by modal form)
-    const newTask: Task = {
-      id: Date.now(),
-      task: "New task",
-      priority: "Medium",
-      status: "To Do",
-      deadline: "-",
-      assignee: "-",
-      tag: "-",
-			author: "Test Author"
-    };
-    
-    setTasks((prev) => [...prev, newTask]);
-  };
-
-  const columns: GridColDef[] = [
-    { field: "task", headerName: "Task", flex: 1, minWidth: 200 },
-    {
-      field: "priority",
-      headerName: "Priority",
-      flex: 1,
-      minWidth: 130,
-      renderCell: (params) => (
-        <Chip 
-          label={params.value} 
-          color={PriorityColor[params.value as keyof typeof PriorityColor]} 
-          variant="outlined" 
-        />
-      )
-    },
-    {
-      field: "status",
-      headerName: "Status",
-      flex: 1,
-      minWidth: 150,
-      renderCell: (params) => (
-        <Chip 
-          label={params.value} 
-          color={StatusColor[params.value as keyof typeof StatusColor]} 
-          variant="outlined" 
-        />
-      )
-    },
-    { field: "deadline", headerName: "Deadline", flex: 1, minWidth: 120 },
-    {
-      field: "assignee",
-      headerName: "Assignee",
-      flex: 1,
-      minWidth: 120,
-      renderCell: (params) => (
-        <Avatar sx={{ width: 28, height: 28, bgcolor: "grey.400", fontSize: 14 }}>
-          {params.value?.slice(0, 1)}
-        </Avatar>
-      )
-    },
-    {
-      field: "tag",
-      headerName: "Tag",
-      flex: 1,
-      minWidth: 120,
-      renderCell: (params) => <Chip label={params.value} size="small" />
-    }
-  ];
+export default function TaskTable({ rows, setOpen}: 
+	{ rows: Task[]; setOpen: (open: boolean) => void}
+) {
 
   return (
     <Box sx={{ bgcolor: "#fff", p: 3, borderRadius: 3, boxShadow: 1 }}>
@@ -83,7 +18,7 @@ export default function TaskTable() {
 
       <Box sx={{ height: 480 }}>
         <DataGrid
-          rows={tasks}
+          rows={rows}
           columns={columns}
           disableRowSelectionOnClick
           sx={{
@@ -98,7 +33,7 @@ export default function TaskTable() {
 
       <Button
         startIcon={<AddIcon />}
-        onClick={addTask}
+        onClick={() => setOpen(true)}
         sx={{ mt: 2, textTransform: "none" }}
       >
         Add task
