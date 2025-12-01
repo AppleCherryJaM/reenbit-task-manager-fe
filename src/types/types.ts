@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 export type TaskStatus = "pending" | "in_progress" | "completed";
 export type TaskPriority = "low" | "medium" | "high";
 export type UserRole = "user" | "admin";
@@ -23,3 +25,13 @@ export interface Task {
 	author: User;
 	assignees: User[];
 }
+
+export interface RouteConfig {
+	path: string;
+	element: ReactNode;
+	children?: RouteConfig[];
+	index?: boolean;
+	auth?: boolean;
+}
+
+export type RouteType = "public" | "private";
