@@ -5,7 +5,7 @@ import axios, {
 	type InternalAxiosRequestConfig,
 } from "axios";
 
-const API_BASE_URL = import.meta.env.NEXT_PUBLIC_API_URL || "";
+const API_BASE_URL = import.meta.env.VITE_SERVER_URL || "";
 
 interface TokenResponse {
 	accessToken: string;

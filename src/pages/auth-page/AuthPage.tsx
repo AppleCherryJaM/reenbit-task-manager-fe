@@ -1,6 +1,4 @@
-// pages/auth-page/AuthPage.tsx
-
-import { Alert, Box, Container, Paper } from "@mui/material";
+import { Alert, Container, Paper } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthForm from "@/components/auth/AuthForm";
@@ -30,12 +28,11 @@ export default function AuthPage() {
 				response = await authService.register(data);
 			}
 
-			// Преобразуем данные из API в формат store
 			const storeUser = adaptApiUserToStore(response.user);
 			setAuth(storeUser, response.accessToken);
 			navigate("/tasks");
 		} catch (err: any) {
-			setError(err.message || `Ошибка при ${mode === "login" ? "входе" : "регистрации"}`);
+			setError(err.message || `Error while ${mode === "login" ? "login" : "registration"}`);
 		} finally {
 			setLoading(false);
 		}

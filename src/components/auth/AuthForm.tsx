@@ -18,6 +18,19 @@ interface AuthFormProps {
 	onModeChange: (mode: AuthMode) => void;
 }
 
+enum AuthFormStrings {
+	LOGIN_TITLE = "Login",
+	REGISTER_TITLE = "Register",
+	LOGIN_BUTTON = "Login",
+	REGISTER_BUTTON = "Register",
+	SWITCH_TO_REGISTER = "Don't have an account? Register",
+	SWITCH_TO_LOGIN = "Already have an account? Login",
+	PASSWORD_LABEL = "Password",
+	CONFIRM_PASSWORD_LABEL = "Confirm Password",
+	EMAIL_LABEL = "Email",
+	NAME_LABEL = "Name",
+}
+
 export default function AuthForm({ mode, onSubmit, loading, onModeChange }: AuthFormProps) {
 	const {
 		formData,
@@ -56,7 +69,7 @@ export default function AuthForm({ mode, onSubmit, loading, onModeChange }: Auth
 	return (
 		<Box component="form" onSubmit={handleSubmit} noValidate>
 			<Typography variant="h5" align="center" gutterBottom>
-				{isLogin ? "Вход в систему" : "Регистрация"}
+				{isLogin ? AuthFormStrings.LOGIN_TITLE : AuthFormStrings.REGISTER_TITLE}
 			</Typography>
 
 			{!isLogin && (
@@ -76,7 +89,7 @@ export default function AuthForm({ mode, onSubmit, loading, onModeChange }: Auth
 
 			<TextField
 				fullWidth
-				label="Email"
+				label={AuthFormStrings.EMAIL_LABEL}
 				name="email"
 				type="email"
 				value={formData.email}
@@ -90,7 +103,7 @@ export default function AuthForm({ mode, onSubmit, loading, onModeChange }: Auth
 
 			<TextField
 				fullWidth
-				label="Пароль"
+				label={AuthFormStrings.PASSWORD_LABEL}
 				name="password"
 				type={showPassword ? "text" : "password"}
 				value={formData.password}
@@ -118,7 +131,7 @@ export default function AuthForm({ mode, onSubmit, loading, onModeChange }: Auth
 			{!isLogin && (
 				<TextField
 					fullWidth
-					label="Подтвердите пароль"
+					label={AuthFormStrings.CONFIRM_PASSWORD_LABEL}
 					type={showConfirmPassword ? "text" : "password"}
 					value={confirmPassword}
 					onChange={(e) => setConfirmPassword(e.target.value)}
@@ -151,12 +164,18 @@ export default function AuthForm({ mode, onSubmit, loading, onModeChange }: Auth
 				sx={{ mt: 3, mb: 2 }}
 				disabled={loading}
 			>
-				{loading ? <CircularProgress size={24} /> : isLogin ? "Войти" : "Зарегистрироваться"}
+				{loading ? (
+					<CircularProgress size={24} />
+				) : isLogin ? (
+					AuthFormStrings.LOGIN_TITLE
+				) : (
+					AuthFormStrings.REGISTER_TITLE
+				)}
 			</Button>
 
 			<Box sx={{ textAlign: "center" }}>
 				<Typography variant="body2" color="text.secondary">
-					{isLogin ? "Ещё нет аккаунта?" : "Уже есть аккаунт?"}{" "}
+					{isLogin ? AuthFormStrings.SWITCH_TO_REGISTER : AuthFormStrings.SWITCH_TO_LOGIN}{" "}
 					<Link
 						component="button"
 						type="button"
@@ -164,7 +183,7 @@ export default function AuthForm({ mode, onSubmit, loading, onModeChange }: Auth
 						sx={{ cursor: "pointer" }}
 						disabled={loading}
 					>
-						{isLogin ? "Зарегистрируйтесь" : "Войдите"}
+						{isLogin ? AuthFormStrings.LOGIN_BUTTON : AuthFormStrings.REGISTER_BUTTON}
 					</Link>
 				</Typography>
 			</Box>

@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import { AuthErrorMessages } from "@/utils/error/ErrorMessages";
 
 export type AuthMode = "login" | "register";
 
@@ -18,31 +19,27 @@ export function useAuthForm(mode: AuthMode = "login") {
 	const validate = useCallback((): boolean => {
 		const newErrors: Record<string, string> = {};
 
-		// Email
 		if (!formData.email.trim()) {
 			newErrors.email = "Email обязателен";
 		} else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-			newErrors.email = "Некорректный email";
+			newErrors.email = AuthErrorMessages.INVALID_EMAIL;
 		}
 
-		// Name (только для регистрации)
 		if (!isLogin && !formData.name?.trim()) {
-			newErrors.name = "Имя обязательно";
+			newErrors.name = AuthErrorMessages.NAME_REQUIRED;
 		}
 
-		// Password
 		if (!formData.password) {
-			newErrors.password = "Пароль обязателен";
+			newErrors.password = AuthErrorMessages.PASSWORD_REQUIRED;
 		} else if (formData.password.length < 6) {
-			newErrors.password = "Пароль должен быть не менее 6 символов";
+			newErrors.password = AuthErrorMessages.PASSWORD_LENGTH;
 		}
 
-		// Confirm password (только для регистрации)
 		if (!isLogin) {
 			if (!confirmPassword) {
-				newErrors.confirmPassword = "Подтвердите пароль";
+				newErrors.confirmPassword = AuthErrorMessages.CONFIRM_PASSWORD_REQUIRED;
 			} else if (formData.password !== confirmPassword) {
-				newErrors.confirmPassword = "Пароли не совпадают";
+				newErrors.confirmPassword = AuthErrorMessages.PASSWORD_MATCH_ERROR;
 			}
 		}
 

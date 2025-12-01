@@ -1,4 +1,3 @@
-// hooks/api/use-tasks.ts
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { CreateTaskData, TaskFilters, UpdateTaskData } from "../../services/task.service";
 import { taskService } from "../../services/task.service";
