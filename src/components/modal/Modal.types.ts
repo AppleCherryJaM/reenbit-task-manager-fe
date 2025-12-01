@@ -1,12 +1,12 @@
 import type { ReactNode } from "react";
 
 export interface ModalBaseProps {
-  open: boolean;
-  title: string;
-  children: ReactNode;
-  primaryBtnText?: string;
-  onClose: () => void;
-  onSubmit?: () => void;
+	open: boolean;
+	title: string;
+	children: ReactNode;
+	primaryBtnText?: string;
+	onClose: () => void;
+	onSubmit?: () => void;
 }
 
 export interface AddTaskFormValues {
