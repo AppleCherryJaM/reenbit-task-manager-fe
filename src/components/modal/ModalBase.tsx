@@ -1,5 +1,4 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
-
 import type { ModalBaseProps } from "./Modal.types";
 
 export default function ModalBase({

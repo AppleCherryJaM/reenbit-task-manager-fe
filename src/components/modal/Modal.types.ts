@@ -7,6 +7,7 @@ export interface ModalBaseProps {
 	primaryBtnText?: string;
 	onClose: () => void;
 	onSubmit?: () => void;
+	disableSubmit?: boolean;
 }
 
 export interface AddTaskFormValues {

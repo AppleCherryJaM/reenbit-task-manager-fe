@@ -20,13 +20,26 @@ export const transformFormToCreateData = (
 	};
 };
 
-export const transformTaskToFormValues = (task: Task): TaskFormValues => {
+export const transformTaskToFormValues = (task: Task | null | undefined): TaskFormValues => {
+	if (!task || Object.keys(task).length === 0 || typeof task !== "object") {
+		return {
+			title: "",
+			description: "",
+			status: "pending",
+			priority: "medium",
+			deadline: null,
+			assigneeIds: [],
+		};
+	}
+
+	const assigneeIds = task.assignees ? task.assignees.map((user) => user.id) : [];
+
 	return {
 		title: task.title,
 		description: task.description,
 		status: task.status,
 		priority: task.priority,
 		deadline: formatDateForInput(task.deadline),
-		assigneeIds: task.assignees.map((user) => user.id),
+		assigneeIds,
 	};
 };

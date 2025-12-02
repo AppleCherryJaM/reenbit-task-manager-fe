@@ -1,3 +1,5 @@
+import { useTaskForm } from "@hooks/useTaskForm";
+import { useUsers } from "@hooks/useUsers";
 import {
 	Box,
 	Checkbox,
@@ -11,27 +13,17 @@ import {
 	Select,
 	TextField,
 } from "@mui/material";
-import { useTaskForm } from "../../hooks/useTaskForm";
-import { useUsers } from "../../hooks/useUsers";
-import type { TaskFormValues } from "../../schemas/task.schema";
-import type { User } from "../../types/types";
-
-interface TaskFormProps {
-	initialData?: Partial<TaskFormValues>;
-	onFormChange?: (data: TaskFormValues, isValid: boolean) => void;
-	currentUserId: string;
-}
-
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-	PaperProps: {
-		style: {
-			maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-			width: 250,
-		},
-	},
-};
+import type { TaskFormValues } from "@/schemas/task.schema";
+import type { User } from "@/types/types";
+import {
+	FORM_HELPER_TEXT,
+	LOADING_USERS_PLACEHOLDER,
+	MenuProps,
+	PriorityOptions,
+	StatusOptions,
+	type TaskFormProps,
+	TaskFormStrings,
+} from "./task-form.types";
 
 export default function TaskForm({ initialData = {}, onFormChange, currentUserId }: TaskFormProps) {
 	const { form, errors, updateField, validateForm } = useTaskForm(initialData);
@@ -56,7 +48,7 @@ export default function TaskForm({ initialData = {}, onFormChange, currentUserId
 	return (
 		<Box sx={{ display: "flex", flexDirection: "column", gap: 3, pt: 1 }}>
 			<TextField
-				label="Название задачи *"
+				label={TaskFormStrings.TITLE_LABEL}
 				value={form.title}
 				onChange={(e) => handleChange("title", e.target.value)}
 				error={!!errors.title}
@@ -66,7 +58,7 @@ export default function TaskForm({ initialData = {}, onFormChange, currentUserId
 			/>
 
 			<TextField
-				label="Описание"
+				label={TaskFormStrings.DESCRIPTION_LABEL}
 				value={form.description || ""}
 				onChange={(e) => handleChange("description", e.target.value)}
 				error={!!errors.description}
@@ -79,29 +71,29 @@ export default function TaskForm({ initialData = {}, onFormChange, currentUserId
 
 			<Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
 				<FormControl fullWidth error={!!errors.status}>
-					<InputLabel>Статус</InputLabel>
+					<InputLabel>{TaskFormStrings.STATUS_LABEL}</InputLabel>
 					<Select
 						value={form.status}
-						label="Статус"
+						label={TaskFormStrings.STATUS_LABEL}
 						onChange={(e) => handleChange("status", e.target.value)}
 					>
-						<MenuItem value="pending">Ожидает</MenuItem>
-						<MenuItem value="in_progress">В работе</MenuItem>
-						<MenuItem value="completed">Завершена</MenuItem>
+						<MenuItem value="pending">{StatusOptions.PENDING}</MenuItem>
+						<MenuItem value="in_progress">{StatusOptions.IN_PROGRESS}</MenuItem>
+						<MenuItem value="completed">{StatusOptions.COMPLETED}</MenuItem>
 					</Select>
 					{errors.status && <FormHelperText>{errors.status}</FormHelperText>}
 				</FormControl>
 
 				<FormControl fullWidth error={!!errors.priority}>
-					<InputLabel>Приоритет</InputLabel>
+					<InputLabel>{TaskFormStrings.PRIORITY_LABEL}</InputLabel>
 					<Select
 						value={form.priority}
-						label="Приоритет"
+						label={TaskFormStrings.PRIORITY_LABEL}
 						onChange={(e) => handleChange("priority", e.target.value)}
 					>
-						<MenuItem value="Low">Низкий</MenuItem>
-						<MenuItem value="Medium">Средний</MenuItem>
-						<MenuItem value="High">Высокий</MenuItem>
+						<MenuItem value="Low">{PriorityOptions.LOW}</MenuItem>
+						<MenuItem value="Medium">{PriorityOptions.MEDIUM}</MenuItem>
+						<MenuItem value="High">{PriorityOptions.HIGH}</MenuItem>
 					</Select>
 					{errors.priority && <FormHelperText>{errors.priority}</FormHelperText>}
 				</FormControl>
@@ -120,12 +112,12 @@ export default function TaskForm({ initialData = {}, onFormChange, currentUserId
 			</FormControl>
 
 			<FormControl fullWidth error={!!errors.assigneeIds}>
-				<InputLabel>Исполнители *</InputLabel>
+				<InputLabel>{TaskFormStrings.ASSIGNEES_LABEL}</InputLabel>
 				<Select
 					multiple
 					value={form.assigneeIds}
 					onChange={(e) => handleChange("assigneeIds", e.target.value as string[])}
-					input={<OutlinedInput label="Исполнители" />}
+					input={<OutlinedInput label={TaskFormStrings.ASSIGNEES_LABEL} />}
 					renderValue={(selected: string[]) => (
 						<Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
 							{selected.map((userId: string) => {
@@ -144,7 +136,7 @@ export default function TaskForm({ initialData = {}, onFormChange, currentUserId
 					disabled={isLoading}
 				>
 					{isLoading ? (
-						<MenuItem disabled>Загрузка пользователей...</MenuItem>
+						<MenuItem disabled>{LOADING_USERS_PLACEHOLDER}</MenuItem>
 					) : (
 						availableUsers.map((user: User) => (
 							<MenuItem key={user.id} value={user.id}>
@@ -158,9 +150,7 @@ export default function TaskForm({ initialData = {}, onFormChange, currentUserId
 					)}
 				</Select>
 				{errors.assigneeIds && <FormHelperText error>{errors.assigneeIds}</FormHelperText>}
-				{!errors.assigneeIds && !isLoading && (
-					<FormHelperText>Выберите хотя бы одного исполнителя</FormHelperText>
-				)}
+				{!errors.assigneeIds && !isLoading && <FormHelperText>{FORM_HELPER_TEXT}</FormHelperText>}
 			</FormControl>
 		</Box>
 	);
