@@ -1,5 +1,5 @@
 // components/modal/CreateTaskModal.tsx
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useUsers } from "@/hooks/useUsers";
 import type { TaskFormValues } from "@/schemas/task.schema";
 import { useModalStore } from "@/store/modal.store";
@@ -20,12 +20,17 @@ export default function CreateTaskModal({
 	currentUserId,
 }: CreateTaskModalProps) {
 	const { isTaskModalOpen, editingTask, closeTaskModal } = useModalStore();
-
-	// biome-ignore lint/correctness/noUnusedVariables: <explanation>
-	const { users = [], isLoading: usersLoading } = useUsers();
+	const { isLoading: usersLoading } = useUsers();
 
 	const [formData, setFormData] = useState<TaskFormValues | null>(null);
 	const [isFormValid, setIsFormValid] = useState(false);
+
+	useEffect(() => {
+		if (!isTaskModalOpen) {
+			setFormData(null);
+			setIsFormValid(false);
+		}
+	}, [isTaskModalOpen]);
 
 	const handleFormChange = (data: TaskFormValues, isValid: boolean) => {
 		setFormData(data);
@@ -39,23 +44,37 @@ export default function CreateTaskModal({
 		}
 
 		try {
-			if (editingTask) {
+			if (editingTask && editingTask.id) {
 				const updateData = {
 					id: editingTask.id,
 					...formData,
 				};
+				console.log("Updating task with:", updateData);
 				await onUpdateTask(updateData);
 			} else {
 				const apiData = transformFormToCreateData(formData, currentUserId);
+				console.log("Creating task with:", apiData);
 				await onCreateTask(apiData);
 			}
 
 			closeTaskModal();
-			setFormData(null);
-			setIsFormValid(false);
 		} catch (error) {
 			console.error("Failed to submit task:", error);
 		}
+	};
+
+	const getInitialData = (): TaskFormValues => {
+		if (editingTask) {
+			return transformTaskToFormValues(editingTask);
+		}
+		return {
+			title: "",
+			description: "",
+			status: "pending",
+			priority: "medium",
+			deadline: null,
+			assigneeIds: [],
+		};
 	};
 
 	return (
@@ -68,7 +87,7 @@ export default function CreateTaskModal({
 			disableSubmit={usersLoading || !isFormValid}
 		>
 			<TaskForm
-				initialData={transformTaskToFormValues(editingTask)}
+				initialData={getInitialData()}
 				onFormChange={handleFormChange}
 				currentUserId={currentUserId}
 			/>

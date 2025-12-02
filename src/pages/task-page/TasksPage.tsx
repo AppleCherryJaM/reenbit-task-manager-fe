@@ -36,6 +36,7 @@ export default function TasksPage() {
 	const currentUserId = getCurrentUserId();
 
 	const handleCreateTask = async (taskData: any) => {
+		console.log("handleCreateTask called with:", taskData);
 		try {
 			if (!currentUserId) {
 				throw new Error("User ID is required to create a task");
@@ -46,24 +47,30 @@ export default function TasksPage() {
 				authorId: currentUserId,
 			};
 
+			console.log("Sending to API: ", taskDataWithAuthor);
+
 			await createTaskMutation.mutateAsync(taskDataWithAuthor);
 			showNotification(TaskPageStrings.CREATE_TASK_SUCCESS, "success");
 		} catch (error) {
 			showNotification(TaskPageStrings.CREATE_TASK_ERROR, "error");
-			console.error(`${TaskPageStrings.CREATE_TASK_ERROR}: ${error}`);
+			console.error(`${TaskPageStrings.CREATE_TASK_ERROR}:`, error);
 		}
 	};
 
 	const handleUpdateTask = async (taskData: any) => {
 		try {
+			const { id, ...updateData } = taskData;
+
+			console.log("Updating task:", id, updateData);
+
 			await updateTaskMutation.mutateAsync({
-				id: taskData.id,
-				data: taskData,
+				id: id,
+				data: updateData,
 			});
 			showNotification(TaskPageStrings.UPDATE_TASK_SUCCESS, "success");
 		} catch (error) {
 			showNotification(TaskPageStrings.UPDATE_TASK_ERROR, "error");
-			console.error(`${TaskPageStrings.UPDATE_TASK_ERROR}: ${error}`);
+			console.error(`${TaskPageStrings.UPDATE_TASK_ERROR}:`, error);
 		}
 	};
 

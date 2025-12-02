@@ -7,6 +7,7 @@ export interface CreateTaskData {
 	status?: TaskStatus;
 	priority?: TaskPriority;
 	deadline?: string | null;
+	authorId?: string;
 	assigneeIds: string[];
 }
 
@@ -26,7 +27,17 @@ export interface TaskFilters {
 
 export class TaskService {
 	async createTask(taskData: CreateTaskData): Promise<Task> {
-		return apiClient.post<Task>("/tasks/new", taskData);
+		const backendData = {
+			title: taskData.title,
+			description: taskData.description,
+			status: taskData.status,
+			priority: taskData.priority,
+			deadline: taskData.deadline,
+			authorId: taskData.authorId,
+			assigneeIds: taskData.assigneeIds || [],
+		};
+
+		return apiClient.post<Task>("/tasks/new", backendData);
 	}
 
 	async getTasks(filters?: TaskFilters): Promise<Task[]> {
@@ -38,7 +49,16 @@ export class TaskService {
 	}
 
 	async updateTask(id: string, taskData: UpdateTaskData): Promise<Task> {
-		return apiClient.put<Task>(`/tasks/${id}`, taskData);
+		const backendData = {
+			title: taskData.title,
+			description: taskData.description,
+			status: taskData.status,
+			priority: taskData.priority,
+			deadline: taskData.deadline,
+			assigneeIds: taskData.assigneeIds,
+		};
+
+		return apiClient.put<Task>(`/tasks/${id}`, backendData);
 	}
 
 	async deleteTask(id: string): Promise<void> {

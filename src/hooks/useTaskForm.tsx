@@ -1,5 +1,5 @@
 import { getDefaultDeadline } from "@utils/date.utils";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { type TaskFormValues, taskSchema } from "@/schemas/task.schema";
 
 const defaultDeadline = 24;
@@ -15,38 +15,33 @@ export const useTaskForm = (initialData: Partial<TaskFormValues> = {}) => {
 		...initialData,
 	});
 
-	const [errors, setErrors] = useState<Record<string, string>>({});
+	const [errors, setErrors] = useState<Partial<Record<keyof TaskFormValues, string>>>({});
 
-	const updateField = <K extends keyof TaskFormValues>(field: K, value: TaskFormValues[K]) => {
-		setForm((prev) => ({
-			...prev,
-			[field]: value,
-		}));
+	const updateField = useCallback(
+		<K extends keyof TaskFormValues>(field: K, value: TaskFormValues[K]) => {
+			setForm((prev) => ({ ...prev, [field]: value }));
+			setErrors((prev) => ({ ...prev, [field]: undefined }));
+		},
+		[]
+	);
 
-		if (errors[field]) {
-			setErrors((prev) => {
-				const newErrors = { ...prev };
-				delete newErrors[field];
-				return newErrors;
-			});
+	const validateForm = useCallback((): boolean => {
+		const newErrors: Partial<Record<keyof TaskFormValues, string>> = {};
+		let isValid = true;
+
+		if (!form.title?.trim()) {
+			newErrors.title = "Title is required";
+			isValid = false;
 		}
-	};
 
-	const validateForm = (): boolean => {
-		try {
-			taskSchema.parse(form);
-			setErrors({});
-			return true;
-		} catch (error: any) {
-			const newErrors: Record<string, string> = {};
-			error.errors.forEach((err: any) => {
-				const path = err.path[0];
-				newErrors[path] = err.message;
-			});
-			setErrors(newErrors);
-			return false;
+		if (form.assigneeIds && form.assigneeIds.length === 0) {
+			newErrors.assigneeIds = "At least one assignee is required";
+			isValid = false;
 		}
-	};
+
+		setErrors(newErrors);
+		return isValid;
+	}, [form]);
 
 	const resetForm = () => {
 		setForm({

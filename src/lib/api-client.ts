@@ -36,9 +36,17 @@ class ApiClient {
 		this.client.interceptors.request.use(
 			(config: InternalAxiosRequestConfig) => {
 				const token = this.getAccessToken();
+
+				console.log("API Request:", {
+					url: config.url,
+					hasToken: !!token,
+					token: token ? `${token.substring(0, 20)}...` : "none",
+				});
+
 				if (token && config.headers) {
 					config.headers.Authorization = `Bearer ${token}`;
 				}
+
 				return config;
 			},
 			(error: AxiosError) => Promise.reject(error)
