@@ -1,46 +1,187 @@
+import AppHeader from "@components/header/AppHeader";
+import TaskTable from "@components/task-table/TaskTable";
+import { Alert, Box, Button, CircularProgress, Snackbar } from "@mui/material";
 import { useState } from "react";
-import { Box } from "@mui/material";
-
-import AddTaskModal from "../../components/modal/AddTaskModal";
-import TaskTable from "../../components/task-table/TaskTable";
-import AppHeader from "../../components/header/AppHeader";
-
-import { initialTasks } from "../../mockData/mock-data";
-import type { AddTaskFormValues } from "../../components/modal/Modal.types";
-import { useToast } from "../../providers/ToastProvider";
+import { useNavigate } from "react-router-dom";
+import CreateTaskModal from "@/components/modal/CreateTaskModal";
+import EditTaskModal from "@/components/modal/EditTaskModal";
+import { useCreateTask, useDeleteTask, useTasks, useUpdateTask } from "@/hooks/api/use-tasks";
+import { authService } from "@/services/auth.service";
+import { useAuthStore } from "@/store/auth.store";
+import { useModalStore } from "@/store/modal.store";
+import type { Task } from "@/types/types";
+import { TaskPageStrings } from "./task-page.types";
 
 export default function TasksPage() {
-  const [open, setOpen] = useState(false);
-  const [tasks, setTasks] = useState<any[]>(initialTasks);
-  const { showToast } = useToast();
+	const navigate = useNavigate();
+	const { openCreateTaskModal, openEditTaskModal } = useModalStore();
+	const { getCurrentUserId, logout: logoutFromStore } = useAuthStore();
 
-  const handleAddTask = (task: AddTaskFormValues) => {
-    setTasks((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        title: task.title,
-        priority: task.priority,
-        dueDate: task.dueDate,
-        tags: task.tags,
-        assignee: task.assignee,
-        status: "In progress"
-      }
-    ]);
+	const [notification, setNotification] = useState<{
+		open: boolean;
+		message: string;
+		severity: "success" | "error";
+	}>({
+		open: false,
+		message: "",
+		severity: "success",
+	});
 
-    showToast("Task added successfully", "success");
-  };
+	const { data: tasks = [], isLoading, error, refetch } = useTasks();
 
-  return (
-    <Box sx={{ p: 3 }}>
-      <AppHeader />
-      <TaskTable rows={tasks} setOpen={setOpen}/>
+	const createTaskMutation = useCreateTask();
+	const updateTaskMutation = useUpdateTask();
+	const deleteTaskMutation = useDeleteTask();
 
-      <AddTaskModal
-        open={open}
-        onClose={() => setOpen(false)}
-        onSubmit={handleAddTask}
-      />
-    </Box>
-  );
+	const currentUserId = getCurrentUserId();
+
+	const handleCreateTask = async (taskData: any) => {
+		console.log("handleCreateTask called with:", taskData);
+		try {
+			if (!currentUserId) {
+				throw new Error("User ID is required to create a task");
+			}
+
+			const taskDataWithAuthor = {
+				...taskData,
+				authorId: currentUserId,
+			};
+
+			console.log("Sending to API: ", taskDataWithAuthor);
+
+			await createTaskMutation.mutateAsync(taskDataWithAuthor);
+			showNotification(TaskPageStrings.CREATE_TASK_SUCCESS, "success");
+		} catch (error) {
+			showNotification(TaskPageStrings.CREATE_TASK_ERROR, "error");
+			console.error(`${TaskPageStrings.CREATE_TASK_ERROR}:`, error);
+		}
+	};
+
+	const handleUpdateTask = async (taskData: any) => {
+		try {
+			const { id, ...updateData } = taskData;
+
+			console.log("Updating task:", id, updateData);
+
+			await updateTaskMutation.mutateAsync({
+				id: id,
+				data: updateData,
+			});
+			showNotification(TaskPageStrings.UPDATE_TASK_SUCCESS, "success");
+		} catch (error) {
+			showNotification(TaskPageStrings.UPDATE_TASK_ERROR, "error");
+			console.error(`${TaskPageStrings.UPDATE_TASK_ERROR}:`, error);
+		}
+	};
+
+	const handleDeleteTask = async (id: string) => {
+		if (window.confirm(TaskPageStrings.DELETE_TASK_CONFIRMATION)) {
+			try {
+				await deleteTaskMutation.mutateAsync(id);
+				showNotification(TaskPageStrings.DELETE_TASK_SUCCESS, "success");
+			} catch (error) {
+				showNotification(TaskPageStrings.DELETE_TASK_ERROR, "error");
+				console.error(`${TaskPageStrings.DELETE_TASK_ERROR}: ${error}`);
+			}
+		}
+	};
+
+	const handleEditTask = (task: Task) => {
+		openEditTaskModal(task);
+	};
+
+	const showNotification = (message: string, severity: "success" | "error") => {
+		setNotification({ open: true, message, severity });
+	};
+
+	const handleCloseNotification = () => {
+		setNotification((prev) => ({ ...prev, open: false }));
+	};
+
+	const handleRetry = () => {
+		refetch();
+	};
+
+	const handleLogout = async () => {
+		try {
+			await authService.logout();
+
+			logoutFromStore();
+
+			navigate("/auth");
+		} catch (error) {
+			console.error("Logout failed:", error);
+			logoutFromStore();
+			navigate("/auth");
+		}
+	};
+
+	if (isLoading) {
+		return (
+			<Box
+				sx={{
+					p: 3,
+					display: "flex",
+					justifyContent: "center",
+					alignItems: "center",
+					height: "100vh",
+				}}
+			>
+				<CircularProgress />
+			</Box>
+		);
+	}
+
+	if (error) {
+		return (
+			<Box sx={{ p: 3 }}>
+				<AppHeader onLogout={handleLogout} />
+
+				<Alert
+					severity="error"
+					sx={{ mb: 2 }}
+					action={
+						<Button color="inherit" size="small" onClick={handleRetry}>
+							Повторить
+						</Button>
+					}
+				>
+					Ошибка загрузки задач: {(error as Error).message}
+				</Alert>
+				<TaskTable
+					rows={[]}
+					onAddTask={openTaskModal}
+					onEditTask={handleEditTask}
+					onDeleteTask={handleDeleteTask}
+					loading={false}
+				/>
+			</Box>
+		);
+	}
+
+	return (
+		<Box sx={{ p: 3 }}>
+			<AppHeader onLogout={handleLogout} />
+
+			<TaskTable
+				rows={tasks}
+				onAddTask={openCreateTaskModal}
+				onEditTask={handleEditTask}
+				onDeleteTask={handleDeleteTask}
+				loading={deleteTaskMutation.isPending}
+			/>
+
+			<CreateTaskModal onCreateTask={handleCreateTask} currentUserId={currentUserId || ""} />
+
+			<EditTaskModal onUpdateTask={handleUpdateTask} currentUserId={currentUserId || ""} />
+
+			<Snackbar
+				open={notification.open}
+				autoHideDuration={3000}
+				onClose={handleCloseNotification}
+				message={notification.message}
+				anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+			/>
+		</Box>
+	);
 }
