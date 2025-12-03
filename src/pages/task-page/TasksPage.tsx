@@ -4,6 +4,7 @@ import { Alert, Box, Button, CircularProgress, Snackbar } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CreateTaskModal from "@/components/modal/CreateTaskModal";
+import EditTaskModal from "@/components/modal/EditTaskModal";
 import ErrorBoundary from "@/components/shared/ErrorBoundary";
 import { useCreateTask, useDeleteTask, useTasks, useUpdateTask } from "@/hooks/api/use-tasks";
 import { useAuthStore } from "@/store/auth.store";
@@ -14,7 +15,7 @@ import { TaskPageStrings } from "./task-page.types";
 
 export default function TasksPage() {
 	// const navigate = useNavigate();
-	const { openTaskModal } = useModalStore();
+	const { openCreateTaskModal, openEditTaskModal } = useModalStore();
 	const { getCurrentUserId } = useAuthStore();
 
 	const [notification, setNotification] = useState<{
@@ -86,9 +87,9 @@ export default function TasksPage() {
 		}
 	};
 
-	const handleEditTask = (task: Task) => {
-		openTaskModal(task);
-	};
+  const handleEditTask = (task: Task) => {
+    openEditTaskModal(task);
+  };
 
 	const showNotification = (message: string, severity: "success" | "error") => {
 		setNotification({ open: true, message, severity });
@@ -151,34 +152,37 @@ export default function TasksPage() {
 		);
 	}
 
-	return (
-		<Box sx={{ p: 3 }}>
-			{/* <AppHeader onLogout={handleLogout} /> */}
+	 return (
+    <Box sx={{ p: 3 }}>
+      <AppHeader />
+      
+      <TaskTable
+        rows={tasks}
+        onAddTask={openCreateTaskModal} // Используем новую функцию
+        onEditTask={handleEditTask}
+        onDeleteTask={handleDeleteTask}
+        loading={deleteTaskMutation.isPending}
+      />
 
-			<AppHeader />
-			<TaskTable
-				rows={tasks}
-				onAddTask={openTaskModal}
-				onEditTask={handleEditTask}
-				onDeleteTask={handleDeleteTask}
-				loading={deleteTaskMutation.isPending}
-			/>
+      {/* Модалка создания */}
+      <CreateTaskModal
+        onCreateTask={handleCreateTask}
+        currentUserId={currentUserId || ""}
+      />
 
-			{/* <ErrorBoundary> */}
-			<CreateTaskModal
-				onCreateTask={handleCreateTask}
-				onUpdateTask={handleUpdateTask}
-				currentUserId={currentUserId || ""}
-			/>
-			{/* </ErrorBoundary> */}
+      {/* Модалка редактирования */}
+      <EditTaskModal
+        onUpdateTask={handleUpdateTask}
+        currentUserId={currentUserId || ""}
+      />
 
-			<Snackbar
-				open={notification.open}
-				autoHideDuration={3000}
-				onClose={handleCloseNotification}
-				message={notification.message}
-				anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-			/>
-		</Box>
-	);
+      <Snackbar
+        open={notification.open}
+        autoHideDuration={3000}
+        onClose={handleCloseNotification}
+        message={notification.message}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      />
+    </Box>
+  );
 }

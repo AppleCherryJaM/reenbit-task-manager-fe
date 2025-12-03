@@ -1,30 +1,34 @@
 import { useEffect, useState } from "react";
 import type { TaskFormValues } from "@/schemas/task.schema";
 import { useModalStore } from "@/store/modal.store";
-import { transformFormToCreateData } from "@/utils/task-transform.utils";
+import { transformTaskToFormValues } from "@/utils/task-transform.utils";
 import TaskForm from "../task-form/TaskForm";
 import ModalBase from "./ModalBase";
 
-interface CreateTaskModalProps {
-  onCreateTask: (taskData: any) => Promise<void>;
+interface EditTaskModalProps {
+  onUpdateTask: (taskData: any) => Promise<void>;
   currentUserId: string;
 }
 
-export default function CreateTaskModal({
-  onCreateTask,
+export default function EditTaskModal({
+  onUpdateTask,
   currentUserId,
-}: CreateTaskModalProps) {
-  const { isCreateTaskModalOpen, closeCreateTaskModal } = useModalStore();
+}: EditTaskModalProps) {
+  const { 
+    isEditTaskModalOpen, 
+    editingTask, 
+    closeEditTaskModal 
+  } = useModalStore();
   
   const [formData, setFormData] = useState<TaskFormValues | null>(null);
   const [isFormValid, setIsFormValid] = useState(false);
 
   useEffect(() => {
-    if (!isCreateTaskModalOpen) {
+    if (!isEditTaskModalOpen) {
       setFormData(null);
       setIsFormValid(false);
     }
-  }, [isCreateTaskModalOpen]);
+  }, [isEditTaskModalOpen]);
 
   const handleFormChange = (data: TaskFormValues, isValid: boolean) => {
     setFormData(data);
@@ -32,21 +36,28 @@ export default function CreateTaskModal({
   };
 
   const handleSubmit = async () => {
-    if (!formData || !isFormValid) {
-      console.error("Form is not valid");
+    if (!formData || !isFormValid || !editingTask) {
+      console.error("Form is not valid or no task to update");
       return;
     }
 
     try {
-      const apiData = transformFormToCreateData(formData, currentUserId);
-      await onCreateTask(apiData);
-      closeCreateTaskModal();
+      const updateData = {
+        id: editingTask.id,
+        ...formData,
+      };
+      await onUpdateTask(updateData);
+      closeEditTaskModal();
     } catch (error) {
-      console.error("Failed to create task:", error);
+      console.error("Failed to update task:", error);
     }
   };
 
   const getInitialData = (): TaskFormValues => {
+    if (editingTask) {
+      return transformTaskToFormValues(editingTask);
+    }
+
     return {
       title: "",
       description: "",
@@ -57,13 +68,15 @@ export default function CreateTaskModal({
     };
   };
 
+  if (!editingTask) { return null; }
+
   return (
     <ModalBase
-      open={isCreateTaskModalOpen}
-      onClose={closeCreateTaskModal}
+      open={isEditTaskModalOpen}
+      onClose={closeEditTaskModal}
       onSubmit={handleSubmit}
-      title="Создать новую задачу"
-      primaryBtnText="Создать"
+      title="Редактировать задачу"
+      primaryBtnText="Сохранить"
       disableSubmit={!isFormValid}
     >
       <TaskForm
