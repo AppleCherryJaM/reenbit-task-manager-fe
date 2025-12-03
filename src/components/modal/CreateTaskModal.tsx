@@ -6,71 +6,68 @@ import TaskForm from "../task-form/TaskForm";
 import ModalBase from "./ModalBase";
 
 interface CreateTaskModalProps {
-  onCreateTask: (taskData: any) => Promise<void>;
-  currentUserId: string;
+	onCreateTask: (taskData: any) => Promise<void>;
+	currentUserId: string;
 }
 
-export default function CreateTaskModal({
-  onCreateTask,
-  currentUserId,
-}: CreateTaskModalProps) {
-  const { isCreateTaskModalOpen, closeCreateTaskModal } = useModalStore();
-  
-  const [formData, setFormData] = useState<TaskFormValues | null>(null);
-  const [isFormValid, setIsFormValid] = useState(false);
+export default function CreateTaskModal({ onCreateTask, currentUserId }: CreateTaskModalProps) {
+	const { isCreateTaskModalOpen, closeCreateTaskModal } = useModalStore();
 
-  useEffect(() => {
-    if (!isCreateTaskModalOpen) {
-      setFormData(null);
-      setIsFormValid(false);
-    }
-  }, [isCreateTaskModalOpen]);
+	const [formData, setFormData] = useState<TaskFormValues | null>(null);
+	const [isFormValid, setIsFormValid] = useState(false);
 
-  const handleFormChange = (data: TaskFormValues, isValid: boolean) => {
-    setFormData(data);
-    setIsFormValid(isValid);
-  };
+	useEffect(() => {
+		if (!isCreateTaskModalOpen) {
+			setFormData(null);
+			setIsFormValid(false);
+		}
+	}, [isCreateTaskModalOpen]);
 
-  const handleSubmit = async () => {
-    if (!formData || !isFormValid) {
-      console.error("Form is not valid");
-      return;
-    }
+	const handleFormChange = (data: TaskFormValues, isValid: boolean) => {
+		setFormData(data);
+		setIsFormValid(isValid);
+	};
 
-    try {
-      const apiData = transformFormToCreateData(formData, currentUserId);
-      await onCreateTask(apiData);
-      closeCreateTaskModal();
-    } catch (error) {
-      console.error("Failed to create task:", error);
-    }
-  };
+	const handleSubmit = async () => {
+		if (!formData || !isFormValid) {
+			console.error("Form is not valid");
+			return;
+		}
 
-  const getInitialData = (): TaskFormValues => {
-    return {
-      title: "",
-      description: "",
-      status: "pending",
-      priority: "medium",
-      deadline: null,
-      assigneeIds: [],
-    };
-  };
+		try {
+			const apiData = transformFormToCreateData(formData, currentUserId);
+			await onCreateTask(apiData);
+			closeCreateTaskModal();
+		} catch (error) {
+			console.error("Failed to create task:", error);
+		}
+	};
 
-  return (
-    <ModalBase
-      open={isCreateTaskModalOpen}
-      onClose={closeCreateTaskModal}
-      onSubmit={handleSubmit}
-      title="Создать новую задачу"
-      primaryBtnText="Создать"
-      disableSubmit={!isFormValid}
-    >
-      <TaskForm
-        initialData={getInitialData()}
-        onFormChange={handleFormChange}
-        currentUserId={currentUserId}
-      />
-    </ModalBase>
-  );
+	const getInitialData = (): TaskFormValues => {
+		return {
+			title: "",
+			description: "",
+			status: "pending",
+			priority: "medium",
+			deadline: null,
+			assigneeIds: [],
+		};
+	};
+
+	return (
+		<ModalBase
+			open={isCreateTaskModalOpen}
+			onClose={closeCreateTaskModal}
+			onSubmit={handleSubmit}
+			title="Создать новую задачу"
+			primaryBtnText="Создать"
+			disableSubmit={!isFormValid}
+		>
+			<TaskForm
+				initialData={getInitialData()}
+				onFormChange={handleFormChange}
+				currentUserId={currentUserId}
+			/>
+		</ModalBase>
+	);
 }

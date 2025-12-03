@@ -10,7 +10,7 @@ export interface ModalBaseProps {
 	disableSubmit?: boolean;
 }
 
-export interface AddTaskFormValues {	
+export interface AddTaskFormValues {
 	title: string;
 	priority: "low" | "medium" | "high";
 	dueDate: string;
@@ -25,9 +25,9 @@ export interface AddTaskModalProps {
 }
 
 export interface TaskFormData {
-  title: string;
-  priority: "low" | "medium" | "high";
-  deadline: string | null;
-  tags: string;
-  assignee: string[];
+	title: string;
+	priority: "low" | "medium" | "high";
+	deadline: string | null;
+	tags: string;
+	assignee: string[];
 }

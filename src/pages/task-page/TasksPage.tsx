@@ -5,18 +5,17 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CreateTaskModal from "@/components/modal/CreateTaskModal";
 import EditTaskModal from "@/components/modal/EditTaskModal";
-import ErrorBoundary from "@/components/shared/ErrorBoundary";
 import { useCreateTask, useDeleteTask, useTasks, useUpdateTask } from "@/hooks/api/use-tasks";
+import { authService } from "@/services/auth.service";
 import { useAuthStore } from "@/store/auth.store";
 import { useModalStore } from "@/store/modal.store";
-
 import type { Task } from "@/types/types";
 import { TaskPageStrings } from "./task-page.types";
 
 export default function TasksPage() {
-	// const navigate = useNavigate();
+	const navigate = useNavigate();
 	const { openCreateTaskModal, openEditTaskModal } = useModalStore();
-	const { getCurrentUserId } = useAuthStore();
+	const { getCurrentUserId, logout: logoutFromStore } = useAuthStore();
 
 	const [notification, setNotification] = useState<{
 		open: boolean;
@@ -87,9 +86,9 @@ export default function TasksPage() {
 		}
 	};
 
-  const handleEditTask = (task: Task) => {
-    openEditTaskModal(task);
-  };
+	const handleEditTask = (task: Task) => {
+		openEditTaskModal(task);
+	};
 
 	const showNotification = (message: string, severity: "success" | "error") => {
 		setNotification({ open: true, message, severity });
@@ -103,10 +102,19 @@ export default function TasksPage() {
 		refetch();
 	};
 
-	// const handleLogout = () => {
-	//   logout();
-	//   navigate('/auth');
-	// };
+	const handleLogout = async () => {
+		try {
+			await authService.logout();
+
+			logoutFromStore();
+
+			navigate("/auth");
+		} catch (error) {
+			console.error("Logout failed:", error);
+			logoutFromStore();
+			navigate("/auth");
+		}
+	};
 
 	if (isLoading) {
 		return (
@@ -127,8 +135,7 @@ export default function TasksPage() {
 	if (error) {
 		return (
 			<Box sx={{ p: 3 }}>
-				{/* <AppHeader onLogout={handleLogout} /> */}
-				<AppHeader />
+				<AppHeader onLogout={handleLogout} />
 
 				<Alert
 					severity="error"
@@ -152,37 +159,29 @@ export default function TasksPage() {
 		);
 	}
 
-	 return (
-    <Box sx={{ p: 3 }}>
-      <AppHeader />
-      
-      <TaskTable
-        rows={tasks}
-        onAddTask={openCreateTaskModal} // Используем новую функцию
-        onEditTask={handleEditTask}
-        onDeleteTask={handleDeleteTask}
-        loading={deleteTaskMutation.isPending}
-      />
+	return (
+		<Box sx={{ p: 3 }}>
+			<AppHeader onLogout={handleLogout} />
 
-      {/* Модалка создания */}
-      <CreateTaskModal
-        onCreateTask={handleCreateTask}
-        currentUserId={currentUserId || ""}
-      />
+			<TaskTable
+				rows={tasks}
+				onAddTask={openCreateTaskModal}
+				onEditTask={handleEditTask}
+				onDeleteTask={handleDeleteTask}
+				loading={deleteTaskMutation.isPending}
+			/>
 
-      {/* Модалка редактирования */}
-      <EditTaskModal
-        onUpdateTask={handleUpdateTask}
-        currentUserId={currentUserId || ""}
-      />
+			<CreateTaskModal onCreateTask={handleCreateTask} currentUserId={currentUserId || ""} />
 
-      <Snackbar
-        open={notification.open}
-        autoHideDuration={3000}
-        onClose={handleCloseNotification}
-        message={notification.message}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      />
-    </Box>
-  );
+			<EditTaskModal onUpdateTask={handleUpdateTask} currentUserId={currentUserId || ""} />
+
+			<Snackbar
+				open={notification.open}
+				autoHideDuration={3000}
+				onClose={handleCloseNotification}
+				message={notification.message}
+				anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+			/>
+		</Box>
+	);
 }

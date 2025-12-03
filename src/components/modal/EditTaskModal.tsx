@@ -6,84 +6,79 @@ import TaskForm from "../task-form/TaskForm";
 import ModalBase from "./ModalBase";
 
 interface EditTaskModalProps {
-  onUpdateTask: (taskData: any) => Promise<void>;
-  currentUserId: string;
+	onUpdateTask: (taskData: any) => Promise<void>;
+	currentUserId: string;
 }
 
-export default function EditTaskModal({
-  onUpdateTask,
-  currentUserId,
-}: EditTaskModalProps) {
-  const { 
-    isEditTaskModalOpen, 
-    editingTask, 
-    closeEditTaskModal 
-  } = useModalStore();
-  
-  const [formData, setFormData] = useState<TaskFormValues | null>(null);
-  const [isFormValid, setIsFormValid] = useState(false);
+export default function EditTaskModal({ onUpdateTask, currentUserId }: EditTaskModalProps) {
+	const { isEditTaskModalOpen, editingTask, closeEditTaskModal } = useModalStore();
 
-  useEffect(() => {
-    if (!isEditTaskModalOpen) {
-      setFormData(null);
-      setIsFormValid(false);
-    }
-  }, [isEditTaskModalOpen]);
+	const [formData, setFormData] = useState<TaskFormValues | null>(null);
+	const [isFormValid, setIsFormValid] = useState(false);
 
-  const handleFormChange = (data: TaskFormValues, isValid: boolean) => {
-    setFormData(data);
-    setIsFormValid(isValid);
-  };
+	useEffect(() => {
+		if (!isEditTaskModalOpen) {
+			setFormData(null);
+			setIsFormValid(false);
+		}
+	}, [isEditTaskModalOpen]);
 
-  const handleSubmit = async () => {
-    if (!formData || !isFormValid || !editingTask) {
-      console.error("Form is not valid or no task to update");
-      return;
-    }
+	const handleFormChange = (data: TaskFormValues, isValid: boolean) => {
+		setFormData(data);
+		setIsFormValid(isValid);
+	};
 
-    try {
-      const updateData = {
-        id: editingTask.id,
-        ...formData,
-      };
-      await onUpdateTask(updateData);
-      closeEditTaskModal();
-    } catch (error) {
-      console.error("Failed to update task:", error);
-    }
-  };
+	const handleSubmit = async () => {
+		if (!formData || !isFormValid || !editingTask) {
+			console.error("Form is not valid or no task to update");
+			return;
+		}
 
-  const getInitialData = (): TaskFormValues => {
-    if (editingTask) {
-      return transformTaskToFormValues(editingTask);
-    }
+		try {
+			const updateData = {
+				id: editingTask.id,
+				...formData,
+			};
+			await onUpdateTask(updateData);
+			closeEditTaskModal();
+		} catch (error) {
+			console.error("Failed to update task:", error);
+		}
+	};
 
-    return {
-      title: "",
-      description: "",
-      status: "pending",
-      priority: "medium",
-      deadline: null,
-      assigneeIds: [],
-    };
-  };
+	const getInitialData = (): TaskFormValues => {
+		if (editingTask) {
+			return transformTaskToFormValues(editingTask);
+		}
 
-  if (!editingTask) { return null; }
+		return {
+			title: "",
+			description: "",
+			status: "pending",
+			priority: "medium",
+			deadline: null,
+			assigneeIds: [],
+		};
+	};
 
-  return (
-    <ModalBase
-      open={isEditTaskModalOpen}
-      onClose={closeEditTaskModal}
-      onSubmit={handleSubmit}
-      title="Редактировать задачу"
-      primaryBtnText="Сохранить"
-      disableSubmit={!isFormValid}
-    >
-      <TaskForm
-        initialData={getInitialData()}
-        onFormChange={handleFormChange}
-        currentUserId={currentUserId}
-      />
-    </ModalBase>
-  );
+	if (!editingTask) {
+		return null;
+	}
+
+	return (
+		<ModalBase
+			open={isEditTaskModalOpen}
+			onClose={closeEditTaskModal}
+			onSubmit={handleSubmit}
+			title="Редактировать задачу"
+			primaryBtnText="Сохранить"
+			disableSubmit={!isFormValid}
+		>
+			<TaskForm
+				initialData={getInitialData()}
+				onFormChange={handleFormChange}
+				currentUserId={currentUserId}
+			/>
+		</ModalBase>
+	);
 }
