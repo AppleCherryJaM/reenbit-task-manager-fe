@@ -42,10 +42,8 @@ export default function TaskForm({ initialData = {}, onFormChange, currentUserId
 		}, 0);
 	};
 
-	// Фильтруем пользователей: исключаем текущего пользователя
 	const availableUsers = users.filter((user: User) => user.id !== currentUserId);
 
-	// Рендер содержимого для Select с пользователями
 	const renderUsersSelectContent = () => {
 		if (usersLoading) {
 			return (
@@ -90,7 +88,6 @@ export default function TaskForm({ initialData = {}, onFormChange, currentUserId
 				required
 			/>
 
-			{/* Description field */}
 			<TextField
 				label={TaskFormStrings.DESCRIPTION_LABEL}
 				value={form.description || ""}
@@ -103,7 +100,6 @@ export default function TaskForm({ initialData = {}, onFormChange, currentUserId
 				variant="outlined"
 			/>
 
-			{/* Status and Priority in row */}
 			<Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
 				<FormControl fullWidth error={!!errors.status}>
 					<InputLabel>{TaskFormStrings.STATUS_LABEL}</InputLabel>
@@ -134,7 +130,6 @@ export default function TaskForm({ initialData = {}, onFormChange, currentUserId
 				</FormControl>
 			</Box>
 
-			{/* Deadline field */}
 			<FormControl fullWidth error={!!errors.deadline}>
 				<TextField
 					label={TaskFormStrings.DEADLINE_LABEL}
@@ -147,7 +142,6 @@ export default function TaskForm({ initialData = {}, onFormChange, currentUserId
 				/>
 			</FormControl>
 
-			{/* Assignees Select */}
 			<FormControl fullWidth error={!!errors.assigneeIds}>
 				<InputLabel>{TaskFormStrings.ASSIGNEES_LABEL}</InputLabel>
 				<Select
@@ -160,10 +154,6 @@ export default function TaskForm({ initialData = {}, onFormChange, currentUserId
 					}}
 					input={<OutlinedInput label={TaskFormStrings.ASSIGNEES_LABEL} />}
 					renderValue={(selected: string[]) => {
-						if (selected.length === 0) {
-							return <Typography color="textSecondary">No assignees selected</Typography>;
-						}
-
 						return (
 							<Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
 								{selected.map((userId: string) => {

@@ -34,11 +34,6 @@ export const useTaskForm = (initialData: Partial<TaskFormValues> = {}) => {
 			isValid = false;
 		}
 
-		if (form.assigneeIds && form.assigneeIds.length === 0) {
-			newErrors.assigneeIds = "At least one assignee is required";
-			isValid = false;
-		}
-
 		setErrors(newErrors);
 		return isValid;
 	}, [form]);
