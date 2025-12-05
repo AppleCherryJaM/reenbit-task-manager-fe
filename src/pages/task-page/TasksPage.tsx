@@ -14,7 +14,6 @@ import type { Task } from "@/types/types";
 import { TaskPageStrings } from "./task-page.types";
 
 export default function TasksPage() {
-	// const navigate = useNavigate();
 	const { openCreateTaskModal, openEditTaskModal } = useModalStore();
 	const { getCurrentUserId } = useAuthStore();
 
@@ -98,11 +97,6 @@ export default function TasksPage() {
 		refetch();
 	};
 
-	// const handleLogout = () => {
-	//   logout();
-	//   navigate('/auth');
-	// };
-
 	if (isLoading) {
 		return (
 			<Box
@@ -122,9 +116,7 @@ export default function TasksPage() {
 	if (error) {
 		return (
 			<Box sx={{ p: 3 }}>
-				{/* <AppHeader onLogout={handleLogout} /> */}
 				<AppHeader />
-
 				<Alert
 					severity="error"
 					sx={{ mb: 2 }}
@@ -138,7 +130,7 @@ export default function TasksPage() {
 				</Alert>
 				<TaskTable
 					rows={[]}
-					onAddTask={openTaskModal}
+					onAddTask={openCreateTaskModal}
 					onEditTask={handleEditTask}
 					onDeleteTask={handleDeleteTask}
 					loading={false}
@@ -153,16 +145,14 @@ export default function TasksPage() {
 
 			<TaskTable
 				rows={tasks}
-				onAddTask={openCreateTaskModal} // Используем новую функцию
+				onAddTask={openCreateTaskModal}
 				onEditTask={handleEditTask}
 				onDeleteTask={handleDeleteTask}
 				loading={deleteTaskMutation.isPending}
 			/>
 
-			{/* Модалка создания */}
 			<CreateTaskModal onCreateTask={handleCreateTask} currentUserId={currentUserId || ""} />
 
-			{/* Модалка редактирования */}
 			<EditTaskModal onUpdateTask={handleUpdateTask} currentUserId={currentUserId || ""} />
 
 			<Snackbar
