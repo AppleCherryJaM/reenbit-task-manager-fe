@@ -37,7 +37,6 @@ export default function TasksPage() {
 	const currentUserId = getCurrentUserId();
 
 	const handleCreateTask = async (taskData: any) => {
-		console.log("handleCreateTask called with:", taskData);
 		try {
 			if (!currentUserId) {
 				throw new Error("User ID is required to create a task");
@@ -47,8 +46,6 @@ export default function TasksPage() {
 				...taskData,
 				authorId: currentUserId,
 			};
-
-			console.log("Sending to API: ", taskDataWithAuthor);
 
 			await createTaskMutation.mutateAsync(taskDataWithAuthor);
 			showNotification(TaskPageStrings.CREATE_TASK_SUCCESS, "success");
@@ -61,8 +58,6 @@ export default function TasksPage() {
 	const handleUpdateTask = async (taskData: any) => {
 		try {
 			const { id, ...updateData } = taskData;
-
-			console.log("Updating task:", id, updateData);
 
 			await updateTaskMutation.mutateAsync({
 				id: id,
@@ -87,9 +82,9 @@ export default function TasksPage() {
 		}
 	};
 
-  const handleEditTask = (task: Task) => {
-    openEditTaskModal(task);
-  };
+	const handleEditTask = (task: Task) => {
+		openEditTaskModal(task);
+	};
 
 	const showNotification = (message: string, severity: "success" | "error") => {
 		setNotification({ open: true, message, severity });
@@ -152,37 +147,31 @@ export default function TasksPage() {
 		);
 	}
 
-	 return (
-    <Box sx={{ p: 3 }}>
-      <AppHeader />
-      
-      <TaskTable
-        rows={tasks}
-        onAddTask={openCreateTaskModal} // Используем новую функцию
-        onEditTask={handleEditTask}
-        onDeleteTask={handleDeleteTask}
-        loading={deleteTaskMutation.isPending}
-      />
+	return (
+		<Box sx={{ p: 3 }}>
+			<AppHeader />
 
-      {/* Модалка создания */}
-      <CreateTaskModal
-        onCreateTask={handleCreateTask}
-        currentUserId={currentUserId || ""}
-      />
+			<TaskTable
+				rows={tasks}
+				onAddTask={openCreateTaskModal} // Используем новую функцию
+				onEditTask={handleEditTask}
+				onDeleteTask={handleDeleteTask}
+				loading={deleteTaskMutation.isPending}
+			/>
 
-      {/* Модалка редактирования */}
-      <EditTaskModal
-        onUpdateTask={handleUpdateTask}
-        currentUserId={currentUserId || ""}
-      />
+			{/* Модалка создания */}
+			<CreateTaskModal onCreateTask={handleCreateTask} currentUserId={currentUserId || ""} />
 
-      <Snackbar
-        open={notification.open}
-        autoHideDuration={3000}
-        onClose={handleCloseNotification}
-        message={notification.message}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      />
-    </Box>
-  );
+			{/* Модалка редактирования */}
+			<EditTaskModal onUpdateTask={handleUpdateTask} currentUserId={currentUserId || ""} />
+
+			<Snackbar
+				open={notification.open}
+				autoHideDuration={3000}
+				onClose={handleCloseNotification}
+				message={notification.message}
+				anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+			/>
+		</Box>
+	);
 }

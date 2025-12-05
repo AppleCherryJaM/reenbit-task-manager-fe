@@ -3,6 +3,7 @@ import { useUsers } from "@hooks/useUsers";
 import {
 	Alert,
 	Box,
+	Button,
 	Checkbox,
 	Chip,
 	CircularProgress,
@@ -28,18 +29,30 @@ import {
 	TaskFormStrings,
 } from "./task-form.types";
 
-export default function TaskForm({ initialData = {}, onFormChange, currentUserId }: TaskFormProps) {
-	const { form, errors, updateField, validateForm } = useTaskForm(initialData);
-	const { users, isLoading: usersLoading } = useUsers(); // ← без error
+export default function TaskForm({
+	initialData = {},
+	onSubmit,
+	currentUserId,
+	onClose,
+}: TaskFormProps) {
+	const { form, errors, updateField, validateForm, resetForm } = useTaskForm(initialData);
+	const { users, isLoading: usersLoading } = useUsers();
 
 	const handleChange = <K extends keyof TaskFormValues>(field: K, value: TaskFormValues[K]) => {
 		updateField(field, value);
+	};
 
-		setTimeout(() => {
-			const isValid = validateForm();
-			const updatedForm = { ...form, [field]: value };
-			onFormChange?.(updatedForm, isValid);
-		}, 0);
+	const handleSubmit = (e: React.FormEvent) => {
+		e.preventDefault();
+
+		if (validateForm()) {
+			onSubmit?.(form);
+		}
+	};
+
+	const handleCancel = () => {
+		resetForm();
+		onClose?.();
 	};
 
 	const availableUsers = users.filter((user: User) => user.id !== currentUserId);
@@ -75,8 +88,12 @@ export default function TaskForm({ initialData = {}, onFormChange, currentUserId
 	};
 
 	return (
-		<Box sx={{ display: "flex", flexDirection: "column", gap: 3, pt: 1 }}>
-			{/* Title field */}
+		<Box
+			component="form"
+			onSubmit={handleSubmit}
+			sx={{ display: "flex", flexDirection: "column", gap: 3, pt: 1 }}
+		>
+			{/* Поля формы */}
 			<TextField
 				label={TaskFormStrings.TITLE_LABEL}
 				value={form.title || ""}
@@ -202,6 +219,20 @@ export default function TaskForm({ initialData = {}, onFormChange, currentUserId
 					</Typography>
 				</Alert>
 			)}
+
+			{/* Кнопки формы */}
+			<Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 3 }}>
+				<Button onClick={handleCancel} color="inherit">
+					Cancel
+				</Button>
+				<Button
+					type="submit"
+					variant="contained"
+					disabled={!form.title || form.title.trim() === ""}
+				>
+					{initialData.title ? "Save Changes" : "Create Task"}
+				</Button>
+			</Box>
 		</Box>
 	);
 }

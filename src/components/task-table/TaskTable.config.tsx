@@ -1,13 +1,13 @@
-import { Avatar, Chip } from "@mui/material";
+import { Delete, Edit } from "@mui/icons-material";
+import { Avatar, Chip, IconButton } from "@mui/material";
 import type { GridColDef } from "@mui/x-data-grid";
 import type { Task } from "@/types/types";
 import { PriorityColor, StatusColor, StatusLabels, TaskTableStrings } from "./TaskTable.types";
 
-const safeValue = <T,>(value: T | null | undefined, fallback: string = "-"): T | string => {
-	return value ?? fallback;
-};
-
-export const columns: GridColDef<Task>[] = [
+export const columns: (
+	onEdit?: (task: Task) => void,
+	onDelete?: (id: string) => void
+) => GridColDef[] = (onEdit, onDelete) => [
 	{
 		field: "title",
 		headerName: TaskTableStrings.TITLE_LABEL,
@@ -19,29 +19,36 @@ export const columns: GridColDef<Task>[] = [
 		headerName: TaskTableStrings.DESCRIPTION_LABEL,
 		flex: 1,
 		minWidth: 250,
-		valueFormatter: (value: string | null) => safeValue(value),
+		valueFormatter: (value) => value || "-",
 	},
 	{
 		field: "priority",
 		headerName: TaskTableStrings.PRIORITY_LABEL,
 		flex: 1,
 		minWidth: 130,
-		renderCell: (params) => (
-			<Chip
-				label={params.value as string}
-				color={PriorityColor[params.value as keyof typeof PriorityColor] || "default"}
-				variant="outlined"
-				size="small"
-			/>
-		),
+		renderCell: ({ row }) => {
+			const priority = row?.priority;
+			if (!priority) {
+				return "-";
+			}
+
+			return (
+				<Chip
+					label={priority}
+					color={PriorityColor[priority as keyof typeof PriorityColor] || "default"}
+					variant="outlined"
+					size="small"
+				/>
+			);
+		},
 	},
 	{
 		field: "status",
 		headerName: TaskTableStrings.STATUS_LABEL,
 		flex: 1,
 		minWidth: 150,
-		renderCell: (params) => {
-			const status = params.value as string;
+		renderCell: ({ row }) => {
+			const status = row?.status;
 			if (!status) {
 				return "-";
 			}
@@ -63,11 +70,15 @@ export const columns: GridColDef<Task>[] = [
 		headerName: TaskTableStrings.DEADLINE_LABEL,
 		flex: 1,
 		minWidth: 120,
-		valueFormatter: (value: string | null) => {
+		valueFormatter: (value) => {
 			if (!value) {
 				return "-";
 			}
-			return new Date(value).toLocaleDateString();
+			try {
+				return new Date(value).toLocaleDateString();
+			} catch {
+				return "-";
+			}
 		},
 	},
 	{
@@ -75,14 +86,8 @@ export const columns: GridColDef<Task>[] = [
 		headerName: TaskTableStrings.ASSIGNEES_LABEL,
 		flex: 1,
 		minWidth: 120,
-		valueFormatter: (assignees: Array<{ name?: string; email: string }> | null) => {
-			if (!assignees || assignees.length === 0) {
-				return "-";
-			}
-			return assignees.map((user) => user.name || user.email).join(", ");
-		},
-		renderCell: (params) => {
-			const assignees = params.row.assignees || [];
+		renderCell: ({ row }) => {
+			const assignees = row?.assignees || [];
 			if (assignees.length === 0) {
 				return "-";
 			}
@@ -100,5 +105,44 @@ export const columns: GridColDef<Task>[] = [
 				</Avatar>
 			);
 		},
+	},
+	{
+		field: "actions",
+		headerName: "Actions",
+		flex: 0.8,
+		minWidth: 120,
+		sortable: false,
+		filterable: false,
+		renderCell: ({ row }) => (
+			<div style={{ display: "flex", gap: "8px" }}>
+				<IconButton
+					size="small"
+					onClick={(e) => {
+						e.preventDefault();
+						e.stopPropagation();
+						onEdit?.(row as Task);
+					}}
+					color="primary"
+					aria-label="edit"
+				>
+					<Edit fontSize="small" />
+				</IconButton>
+
+				<IconButton
+					size="small"
+					onClick={(e) => {
+						e.preventDefault();
+						e.stopPropagation();
+						if (row?.id) {
+							onDelete?.(row.id);
+						}
+					}}
+					color="error"
+					aria-label="delete"
+				>
+					<Delete fontSize="small" />
+				</IconButton>
+			</div>
+		),
 	},
 ];
