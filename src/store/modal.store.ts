@@ -2,31 +2,31 @@ import { create } from "zustand";
 import type { Task } from "@/types/types";
 
 interface ModalStore {
-	isTaskModalOpen: boolean;
-	editingTask: Task | null;
-	openTaskModal: (task?: Task | null) => void;
-	closeTaskModal: () => void;
+	isCreateTaskModalOpen: boolean;
+	openCreateTaskModal: () => void;
+	closeCreateTaskModal: () => void;
 
-	isUserSelectModalOpen: boolean;
-	openUserSelectModal: () => void;
-	closeUserSelectModal: () => void;
+	isEditTaskModalOpen: boolean;
+	editingTask: Task | null;
+	openEditTaskModal: (task: Task) => void;
+	closeEditTaskModal: () => void;
 }
 
 export const useModalStore = create<ModalStore>((set) => ({
-	isTaskModalOpen: false,
+	isCreateTaskModalOpen: false,
+	openCreateTaskModal: () => set({ isCreateTaskModalOpen: true }),
+	closeCreateTaskModal: () => set({ isCreateTaskModalOpen: false }),
+
+	isEditTaskModalOpen: false,
 	editingTask: null,
-	openTaskModal: (task = null) =>
+	openEditTaskModal: (task) =>
 		set({
-			isTaskModalOpen: true,
+			isEditTaskModalOpen: true,
 			editingTask: task,
 		}),
-	closeTaskModal: () =>
+	closeEditTaskModal: () =>
 		set({
-			isTaskModalOpen: false,
+			isEditTaskModalOpen: false,
 			editingTask: null,
 		}),
-
-	isUserSelectModalOpen: false,
-	openUserSelectModal: () => set({ isUserSelectModalOpen: true }),
-	closeUserSelectModal: () => set({ isUserSelectModalOpen: false }),
 }));
