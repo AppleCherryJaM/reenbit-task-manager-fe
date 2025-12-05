@@ -1,7 +1,3 @@
-import dotenv from "dotenv";
-
-dotenv.config();
-
 import axios, {
 	type AxiosError,
 	type AxiosInstance,
@@ -9,7 +5,7 @@ import axios, {
 	type InternalAxiosRequestConfig,
 } from "axios";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "";
+const API_BASE_URL = import.meta.env.VITE_SERVER_URL || "";
 
 interface TokenResponse {
 	accessToken: string;
@@ -40,9 +36,17 @@ class ApiClient {
 		this.client.interceptors.request.use(
 			(config: InternalAxiosRequestConfig) => {
 				const token = this.getAccessToken();
+
+				console.log("API Request:", {
+					url: config.url,
+					hasToken: !!token,
+					token: token ? `${token.substring(0, 20)}...` : "none",
+				});
+
 				if (token && config.headers) {
 					config.headers.Authorization = `Bearer ${token}`;
 				}
+
 				return config;
 			},
 			(error: AxiosError) => Promise.reject(error)
