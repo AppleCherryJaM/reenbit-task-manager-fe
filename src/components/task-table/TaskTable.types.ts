@@ -15,9 +15,9 @@ export const StatusColor = {
 export interface TaskTableProps {
 	rows: Task[];
 	onAddTask: () => void;
-	onEditTask?: (task: Task) => void;
-	onDeleteTask?: (id: string) => void;
-	loading?: boolean;
+	onEditTask: (task: Task) => void;
+	onDeleteTask: (id: string) => void;
+	loading: boolean;
 }
 
 export enum TaskTableStrings {
