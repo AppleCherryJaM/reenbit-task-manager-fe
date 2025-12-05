@@ -1,4 +1,3 @@
-// components/TaskForm.tsx
 import {
 	Box,
 	Checkbox,
@@ -41,7 +40,6 @@ export default function TaskForm({ initialData = {}, onFormChange, currentUserId
 	const handleChange = <K extends keyof TaskFormValues>(field: K, value: TaskFormValues[K]) => {
 		updateField(field, value);
 
-		// Асинхронная валидация и уведомление родителя
 		setTimeout(() => {
 			const isValid = validateForm();
 			const updatedForm = { ...form, [field]: value };
@@ -49,10 +47,8 @@ export default function TaskForm({ initialData = {}, onFormChange, currentUserId
 		}, 0);
 	};
 
-	// Фильтруем пользователей (исключаем текущего если нужно)
 	const availableUsers = users.filter((user: User) => user.id !== currentUserId);
 
-	// Функция для получения отображаемого имени пользователя
 	const getUserDisplayName = (user: User): string => {
 		return user.name || user.email;
 	};

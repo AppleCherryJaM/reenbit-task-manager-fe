@@ -1,6 +1,6 @@
+import { getDefaultDeadline } from "@utils/date.utils";
 import { useState } from "react";
 import { type TaskFormValues, taskSchema } from "@/schemas/task.schema";
-import { getDefaultDeadline } from "@utils/date.utils";
 
 const defaultDeadline = 24;
 

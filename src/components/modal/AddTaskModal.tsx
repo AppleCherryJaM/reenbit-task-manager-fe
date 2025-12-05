@@ -6,7 +6,7 @@ import ModalBase from "./ModalBase";
 export default function AddTaskModal({ open, onClose, onSubmit }: AddTaskModalProps) {
 	const [form, setForm] = useState<AddTaskFormValues>({
 		title: "",
-		priority: "Low",
+		priority: "low",
 		dueDate: "",
 		tags: "",
 		assignee: "",
@@ -20,7 +20,7 @@ export default function AddTaskModal({ open, onClose, onSubmit }: AddTaskModalPr
 		onClose();
 		setForm({
 			title: "",
-			priority: "Low",
+			priority: "low",
 			dueDate: "",
 			tags: "",
 			assignee: "",
