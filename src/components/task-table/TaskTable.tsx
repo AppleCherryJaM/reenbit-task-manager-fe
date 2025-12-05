@@ -1,46 +1,47 @@
-import AddIcon from "@mui/icons-material/Add";
-import { Box, Button, Stack, Typography } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import type { Task } from "@/types/types";
 import { columns } from "./TaskTable.config";
+import type { TaskTableProps } from "./TaskTable.types";
 
 export default function TaskTable({
 	rows,
-	setOpen,
-}: {
-	rows: Task[];
-	setOpen: (open: boolean) => void;
-}) {
-	return (
-		<Box sx={{ bgcolor: "#fff", p: 3, borderRadius: 3, boxShadow: 1 }}>
-			<Stack direction="row" justifyContent="space-between" mb={2}>
-				<Typography variant="h5" fontWeight={600}>
-					Task
-				</Typography>
-			</Stack>
+	onAddTask,
+	onEditTask,
+	onDeleteTask,
+	loading,
+}: TaskTableProps) {
+	const tableColumns = columns(onEditTask, onDeleteTask);
 
-			<Box sx={{ height: 480 }}>
-				<DataGrid
-					rows={rows}
-					columns={columns}
-					disableRowSelectionOnClick
-					sx={{
-						border: "none",
-						"& .MuiDataGrid-columnHeaders": {
-							backgroundColor: "#F3F4F6",
-							fontWeight: 600,
-						},
-					}}
-				/>
+	return (
+		<Box sx={{ height: 600, width: "100%" }}>
+			<Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+				<Button variant="contained" onClick={onAddTask}>
+					Add New Task
+				</Button>
 			</Box>
 
-			<Button
-				startIcon={<AddIcon />}
-				onClick={() => setOpen(true)}
-				sx={{ mt: 2, textTransform: "none" }}
-			>
-				Add task
-			</Button>
+			<DataGrid
+				rows={rows}
+				columns={tableColumns}
+				loading={loading}
+				pageSizeOptions={[5, 10, 25]}
+				initialState={{
+					pagination: {
+						paginationModel: { pageSize: 10 },
+					},
+				}}
+				getRowId={(row) => {
+					if (!row.id) {
+						return `temp-${Math.random()}`;
+					}
+					return row.id;
+				}}
+				sx={{
+					"& .MuiDataGrid-cell:focus": {
+						outline: "none",
+					},
+				}}
+			/>
 		</Box>
 	);
 }
