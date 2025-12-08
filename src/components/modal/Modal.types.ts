@@ -11,7 +11,7 @@ export interface ModalBaseProps {
 
 export interface AddTaskFormValues {
 	title: string;
-	priority: "Low" | "Medium" | "High";
+	priority: "low" | "medium" | "high";
 	dueDate: string;
 	tags: string;
 	assignee: string;
