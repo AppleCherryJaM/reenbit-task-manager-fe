@@ -1,5 +1,70 @@
 import type { Task } from "@/types/types";
 
+export interface BaseTaskTableProps {
+  rows: Task[];
+  totalCount: number;
+  onAddTask: () => void;
+  onEditTask?: (task: Task) => void;
+  onDeleteTask?: (id: string) => void;
+  loading?: boolean;
+}
+
+export interface PaginationProps {
+  onPageChange?: (page: number) => void;
+  onPageSizeChange?: (pageSize: number) => void;
+  currentPage?: number;
+  pageSize?: number;
+}
+
+export interface SortProps {
+  onSortChange?: (field: string, direction: 'asc' | 'desc') => void;
+  currentSort?: {
+    field: string;
+    direction: 'asc' | 'desc';
+  };
+}
+
+export interface FilterProps {
+  onFilterChange?: (key: string, value: string) => void;
+  currentFilters?: {
+    status: string;
+    priority: string;
+  };
+}
+
+export interface TaskHeaderProps {
+  totalCount: number;
+  onAddTask: () => void;
+}
+
+export interface TaskControlsProps {
+  currentSort: {
+    field: string;
+    direction: 'asc' | 'desc';
+  };
+  currentFilters: {
+    status: string;
+    priority: string;
+  };
+  onSortChange?: (field: string, direction: 'asc' | 'desc') => void;
+  onFilterChange?: (key: string, value: string) => void;
+}
+
+export interface TaskPaginationProps {
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
+  onPageChange?: (page: number) => void;
+  onPageSizeChange?: (pageSize: number) => void;
+}
+
+export interface TaskTableProps extends 
+  BaseTaskTableProps, 
+  PaginationProps, 
+  SortProps, 
+  FilterProps {}
+
 export enum PriorityColor {
 	High = "error",
 	Medium = "warning",
@@ -11,21 +76,6 @@ export enum StatusColor {
 	"In Progress" = "warning",
 	"Done" = "success",
 } 
-
-export interface TaskTableProps {
-  rows: Task[];
-  totalCount: number;
-  onAddTask: () => void;
-  onEditTask?: (task: Task) => void;
-  onDeleteTask?: (id: string) => void;
-  loading?: boolean;
-  
-  onPageChange?: (page: number) => void;
-  onPageSizeChange?: (pageSize: number) => void;
-  
-  currentPage?: number;
-  pageSize?: number;
-}
 
 export enum TaskTableStrings {
 	TASKS_LABEL = "Tasks",

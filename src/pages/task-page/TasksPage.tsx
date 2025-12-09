@@ -1,11 +1,6 @@
 import { useCallback, useState } from "react";
-import { 
-  Alert, 
-  Box, 
-  Button, 
-  CircularProgress, 
-  Snackbar 
-} from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { Alert, Box, Button, CircularProgress, Snackbar } from "@mui/material";
 import AppHeader from "@components/header/AppHeader";
 import TaskTable from "@components/task-table/TaskTable";
 import CreateTaskModal from "@/components/modal/CreateTaskModal";
@@ -14,15 +9,15 @@ import { useCreateTask, useDeleteTask, useTasks, useUpdateTask } from "@/hooks/a
 import { authService } from "@/services/auth.service";
 import { useAuthStore } from "@/store/auth.store";
 import { useModalStore } from "@/store/modal.store";
-import type { Task } from "@/types/types";
-import { TaskPageStrings } from "./task-page.types";
-import { useNavigate } from "react-router-dom";
+import { TaskPageStrings, TaskPriority, TaskStatus } from "./task-page.types";
+import type { Task} from "@/types/types";
+import { mapFilterPriorityToApi, mapFilterStatusToApi } from "./task-page.helpers";
+
 
 export default function TasksPage() {
   const navigate = useNavigate();
   const { openCreateTaskModal, openEditTaskModal } = useModalStore();
   const { getCurrentUserId, logout: logoutFromStore } = useAuthStore();
-	
 
   const [notification, setNotification] = useState<{
     open: boolean;
@@ -38,6 +33,22 @@ export default function TasksPage() {
     pageSize: 10,
   });
 
+  const [sortState, setSortState] = useState<{
+    field: string;
+    direction: 'asc' | 'desc';
+  }>({
+    field: 'createdAt',
+    direction: 'desc'
+  });
+
+  const [filterState, setFilterState] = useState<{
+    status: string;
+    priority: string;
+  }>({
+    status: 'all',
+    priority: 'all'
+  });
+
   const createTaskMutation = useCreateTask();
   const updateTaskMutation = useUpdateTask();
   const deleteTaskMutation = useDeleteTask();
@@ -48,10 +59,6 @@ export default function TasksPage() {
     setPaginationState(prev => ({ ...prev, page }));
   }, []);
 
-	const handlePageSizeChange = useCallback((pageSize: number) => {
-    setPaginationState({ page: 0, pageSize });
-  }, []);
-
 	const { 
     data: response, 
     isLoading, 
@@ -60,7 +67,25 @@ export default function TasksPage() {
   } = useTasks({
     page: paginationState.page + 1,
     limit: paginationState.pageSize,
+    sortBy: sortState.field,
+    sortDirection: sortState.direction,
+    status: mapFilterStatusToApi(filterState.status),
+    priority: mapFilterPriorityToApi(filterState.priority),
   });
+
+  const handlePageSizeChange = useCallback((pageSize: number) => {
+    setPaginationState({ page: 0, pageSize });
+  }, []);
+
+  const handleSortChange = useCallback((field: string, direction: 'asc' | 'desc') => {
+    setSortState({ field, direction });
+    refetch();
+  }, [refetch]);
+
+  const handleFilterChange = useCallback((key: string, value: string) => {
+    setFilterState(prev => ({ ...prev, [key]: value }));
+    refetch();
+  }, [refetch]);
 
   const handleCreateTask = async (taskData: any) => {
     try {
@@ -164,10 +189,17 @@ export default function TasksPage() {
         onEditTask={handleEditTask}
         onDeleteTask={handleDeleteTask}
         loading={deleteTaskMutation.isPending}
+
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
         currentPage={paginationState.page}
         pageSize={paginationState.pageSize}
+
+        onSortChange={handleSortChange}
+        currentSort={sortState}
+        
+        onFilterChange={handleFilterChange}
+        currentFilters={filterState}
       />
 
       <CreateTaskModal 

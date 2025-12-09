@@ -22,6 +22,8 @@ export interface TaskFilters {
 	limit?: number;
 	fromDate?: string;
 	toDate?: string;
+	sortBy?: string;
+  sortDirection?: 'asc' | 'desc'; 
 }
 
 export interface TasksResponse {

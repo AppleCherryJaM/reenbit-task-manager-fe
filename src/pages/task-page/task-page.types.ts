@@ -8,5 +8,19 @@ export enum TaskPageStrings {
 	DELETE_TASK_CONFIRMATION = "Are you sure you want to delete this task?",
 	REPEAT = "Repeat",
 	LOAD_TASKS_ERROR = "Error loading tasks:",
-
 }
+
+export enum TaskStatus {
+  PENDING = "pending",
+  IN_PROGRESS = "in_progress",
+  COMPLETED = "completed",
+}
+
+export enum TaskPriority {
+  HIGH = "high",
+  MEDIUM = "medium",
+  LOW = "low",
+}
+
+export type TaskStatusFilter = TaskStatus | "all";
+export type TaskPriorityFilter = TaskPriority | "all";
