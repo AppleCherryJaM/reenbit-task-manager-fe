@@ -36,7 +36,6 @@ export default function TasksPage() {
 	const currentUserId = getCurrentUserId();
 
 	const handleCreateTask = async (taskData: any) => {
-		console.log("handleCreateTask called with:", taskData);
 		try {
 			if (!currentUserId) {
 				throw new Error("User ID is required to create a task");
@@ -46,9 +45,6 @@ export default function TasksPage() {
 				...taskData,
 				authorId: currentUserId,
 			};
-
-			console.log("Sending to API: ", taskDataWithAuthor);
-
 			await createTaskMutation.mutateAsync(taskDataWithAuthor);
 			showNotification(TaskPageStrings.CREATE_TASK_SUCCESS, "success");
 		} catch (error) {
@@ -60,8 +56,6 @@ export default function TasksPage() {
 	const handleUpdateTask = async (taskData: any) => {
 		try {
 			const { id, ...updateData } = taskData;
-
-			console.log("Updating task:", id, updateData);
 
 			await updateTaskMutation.mutateAsync({
 				id: id,
@@ -142,11 +136,11 @@ export default function TasksPage() {
 					sx={{ mb: 2 }}
 					action={
 						<Button color="inherit" size="small" onClick={handleRetry}>
-							Повторить
+							Repeat
 						</Button>
 					}
 				>
-					Ошибка загрузки задач: {(error as Error).message}
+					Loading tasks error: {(error as Error).message}
 				</Alert>
 				<TaskTable
 					rows={[]}
