@@ -13,9 +13,29 @@ interface CreateTaskModalProps {
 export default function CreateTaskModal({ onCreateTask, currentUserId }: CreateTaskModalProps) {
 	const { isCreateTaskModalOpen, closeCreateTaskModal } = useModalStore();
 
-	const handleSubmit = async (data: TaskFormValues) => {
+	const [formData, setFormData] = useState<TaskFormValues | null>(null);
+	const [isFormValid, setIsFormValid] = useState(false);
+
+	useEffect(() => {
+		if (!isCreateTaskModalOpen) {
+			setFormData(null);
+			setIsFormValid(false);
+		}
+	}, [isCreateTaskModalOpen]);
+
+	const handleFormChange = (data: TaskFormValues, isValid: boolean) => {
+		setFormData(data);
+		setIsFormValid(isValid);
+	};
+
+	const handleSubmit = async () => {
+		if (!formData || !isFormValid) {
+			console.error("Form is not valid");
+			return;
+		}
+
 		try {
-			const apiData = transformFormToCreateData(data, currentUserId);
+			const apiData = transformFormToCreateData(formData, currentUserId);
 			await onCreateTask(apiData);
 			closeCreateTaskModal();
 		} catch (error) {
@@ -23,19 +43,30 @@ export default function CreateTaskModal({ onCreateTask, currentUserId }: CreateT
 		}
 	};
 
+	const getInitialData = (): TaskFormValues => {
+		return {
+			title: "",
+			description: "",
+			status: "pending",
+			priority: "medium",
+			deadline: null,
+			assigneeIds: [],
+		};
+	};
+
 	return (
 		<ModalBase
 			open={isCreateTaskModalOpen}
 			onClose={closeCreateTaskModal}
-			onSubmit={() => {}}
-			title="Create New Task"
-			primaryBtnText="Create"
-			disableSubmit={false}
+			onSubmit={handleSubmit}
+			title="Создать новую задачу"
+			primaryBtnText="Создать"
+			disableSubmit={!isFormValid}
 		>
 			<TaskForm
-				onSubmit={handleSubmit}
+				initialData={getInitialData()}
+				onFormChange={handleFormChange}
 				currentUserId={currentUserId}
-				onClose={closeCreateTaskModal}
 			/>
 		</ModalBase>
 	);

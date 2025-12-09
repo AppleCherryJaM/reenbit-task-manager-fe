@@ -5,18 +5,17 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CreateTaskModal from "@/components/modal/CreateTaskModal";
 import EditTaskModal from "@/components/modal/EditTaskModal";
-import ErrorBoundary from "@/components/shared/ErrorBoundary";
 import { useCreateTask, useDeleteTask, useTasks, useUpdateTask } from "@/hooks/api/use-tasks";
+import { authService } from "@/services/auth.service";
 import { useAuthStore } from "@/store/auth.store";
 import { useModalStore } from "@/store/modal.store";
-
 import type { Task } from "@/types/types";
 import { TaskPageStrings } from "./task-page.types";
 
 export default function TasksPage() {
-	// const navigate = useNavigate();
+	const navigate = useNavigate();
 	const { openCreateTaskModal, openEditTaskModal } = useModalStore();
-	const { getCurrentUserId } = useAuthStore();
+	const { getCurrentUserId, logout: logoutFromStore } = useAuthStore();
 
 	const [notification, setNotification] = useState<{
 		open: boolean;
@@ -46,7 +45,6 @@ export default function TasksPage() {
 				...taskData,
 				authorId: currentUserId,
 			};
-
 			await createTaskMutation.mutateAsync(taskDataWithAuthor);
 			showNotification(TaskPageStrings.CREATE_TASK_SUCCESS, "success");
 		} catch (error) {
@@ -98,10 +96,19 @@ export default function TasksPage() {
 		refetch();
 	};
 
-	// const handleLogout = () => {
-	//   logout();
-	//   navigate('/auth');
-	// };
+	const handleLogout = async () => {
+		try {
+			await authService.logout();
+
+			logoutFromStore();
+
+			navigate("/auth");
+		} catch (error) {
+			console.error("Logout failed:", error);
+			logoutFromStore();
+			navigate("/auth");
+		}
+	};
 
 	if (isLoading) {
 		return (
@@ -122,19 +129,18 @@ export default function TasksPage() {
 	if (error) {
 		return (
 			<Box sx={{ p: 3 }}>
-				{/* <AppHeader onLogout={handleLogout} /> */}
-				<AppHeader />
+				<AppHeader onLogout={handleLogout} />
 
 				<Alert
 					severity="error"
 					sx={{ mb: 2 }}
 					action={
 						<Button color="inherit" size="small" onClick={handleRetry}>
-							Повторить
+							Repeat
 						</Button>
 					}
 				>
-					Ошибка загрузки задач: {(error as Error).message}
+					Loading tasks error: {(error as Error).message}
 				</Alert>
 				<TaskTable
 					rows={[]}
@@ -149,11 +155,11 @@ export default function TasksPage() {
 
 	return (
 		<Box sx={{ p: 3 }}>
-			<AppHeader />
+			<AppHeader onLogout={handleLogout} />
 
 			<TaskTable
 				rows={tasks}
-				onAddTask={openCreateTaskModal} // Используем новую функцию
+				onAddTask={openCreateTaskModal}
 				onEditTask={handleEditTask}
 				onDeleteTask={handleDeleteTask}
 				loading={deleteTaskMutation.isPending}
