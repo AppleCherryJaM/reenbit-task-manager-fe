@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import type { TaskFormValues } from "@/schemas/task.schema";
 import { useModalStore } from "@/store/modal.store";
 import { transformFormToCreateData } from "@/utils/task-transform.utils";
@@ -13,9 +12,9 @@ interface CreateTaskModalProps {
 export default function CreateTaskModal({ onCreateTask, currentUserId }: CreateTaskModalProps) {
 	const { isCreateTaskModalOpen, closeCreateTaskModal } = useModalStore();
 
-	const handleSubmit = async (data: TaskFormValues) => {
+	const handleSubmit = async (formValues: TaskFormValues): Promise<void> => {
 		try {
-			const apiData = transformFormToCreateData(data, currentUserId);
+			const apiData = transformFormToCreateData(formValues, currentUserId);
 			await onCreateTask(apiData);
 			closeCreateTaskModal();
 		} catch (error) {

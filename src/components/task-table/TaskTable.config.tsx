@@ -3,7 +3,7 @@ import type { GridColDef } from "@mui/x-data-grid";
 import type { Task } from "@/types/types";
 import { PriorityColor, StatusColor, StatusLabels, TaskTableStrings } from "./TaskTable.types";
 
-const safeValue = <T,>(value: T | null | undefined, fallback: string = "-"): T | string => {
+const safeValue = <T,>(value: T | null | undefined, fallback: string = TaskTableStrings.NONE): T | string => {
 	return value ?? fallback;
 };
 
@@ -42,8 +42,9 @@ export const columns: GridColDef<Task>[] = [
 		minWidth: 150,
 		renderCell: (params) => {
 			const status = params.value as string;
+
 			if (!status) {
-				return "-";
+				return TaskTableStrings.NONE;
 			}
 
 			const statusText = StatusLabels[status as keyof typeof StatusLabels] || status;
@@ -64,9 +65,11 @@ export const columns: GridColDef<Task>[] = [
 		flex: 1,
 		minWidth: 120,
 		valueFormatter: (value: string | null) => {
+
 			if (!value) {
-				return "-";
+				return TaskTableStrings.NONE;
 			}
+
 			return new Date(value).toLocaleDateString();
 		},
 	},
@@ -76,15 +79,18 @@ export const columns: GridColDef<Task>[] = [
 		flex: 1,
 		minWidth: 120,
 		valueFormatter: (assignees: Array<{ name?: string; email: string }> | null) => {
+
 			if (!assignees || assignees.length === 0) {
-				return "-";
+				return TaskTableStrings.NONE;
 			}
+
 			return assignees.map((user) => user.name || user.email).join(", ");
 		},
 		renderCell: (params) => {
 			const assignees = params.row.assignees || [];
+
 			if (assignees.length === 0) {
-				return "-";
+				return TaskTableStrings.NONE;
 			}
 
 			return (

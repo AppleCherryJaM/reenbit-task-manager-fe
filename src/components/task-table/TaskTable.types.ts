@@ -29,6 +29,7 @@ export enum TaskTableStrings {
 	STATUS_LABEL = "Status",
 	DESCRIPTION_LABEL = "Description",
 	TITLE_LABEL = "Title",
+	NONE = "-"
 }
 
 export enum StatusLabels {
