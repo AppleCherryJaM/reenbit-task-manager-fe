@@ -1,8 +1,8 @@
+import TaskForm from "@components/task-form/TaskForm";
 import { useEffect } from "react";
 import type { TaskFormValues } from "@/schemas/task.schema";
 import { useModalStore } from "@/store/modal.store";
 import { transformTaskToFormValues } from "@/utils/task-transform.utils";
-import TaskForm from "@components/task-form/TaskForm";
 import ModalBase from "./ModalBase";
 
 interface EditTaskModalProps {
@@ -14,15 +14,12 @@ export default function EditTaskModal({ onUpdateTask, currentUserId }: EditTaskM
 	const { isEditTaskModalOpen, editingTask, closeEditTaskModal } = useModalStore();
 
 	useEffect(() => {
-		
 		if (!isEditTaskModalOpen) {
 			// TO DO: add a reset if needed.
 		}
-
 	}, [isEditTaskModalOpen]);
 
 	const handleSubmit = async (data: TaskFormValues): Promise<void> => {
-		
 		if (!editingTask) {
 			return;
 		}
@@ -40,7 +37,6 @@ export default function EditTaskModal({ onUpdateTask, currentUserId }: EditTaskM
 	};
 
 	const getInitialData = (): Partial<TaskFormValues> => {
-		
 		if (!editingTask) {
 			return {};
 		}

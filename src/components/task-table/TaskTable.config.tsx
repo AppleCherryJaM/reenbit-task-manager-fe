@@ -3,7 +3,10 @@ import type { GridColDef } from "@mui/x-data-grid";
 import type { Task } from "@/types/types";
 import { PriorityColor, StatusColor, StatusLabels, TaskTableStrings } from "./TaskTable.types";
 
-const safeValue = <T,>(value: T | null | undefined, fallback: string = TaskTableStrings.NONE): T | string => {
+const safeValue = <T,>(
+	value: T | null | undefined,
+	fallback: string = TaskTableStrings.NONE
+): T | string => {
 	return value ?? fallback;
 };
 
@@ -65,7 +68,6 @@ export const columns: GridColDef<Task>[] = [
 		flex: 1,
 		minWidth: 120,
 		valueFormatter: (value: string | null) => {
-
 			if (!value) {
 				return TaskTableStrings.NONE;
 			}
@@ -79,7 +81,6 @@ export const columns: GridColDef<Task>[] = [
 		flex: 1,
 		minWidth: 120,
 		valueFormatter: (assignees: Array<{ name?: string; email: string }> | null) => {
-
 			if (!assignees || assignees.length === 0) {
 				return TaskTableStrings.NONE;
 			}

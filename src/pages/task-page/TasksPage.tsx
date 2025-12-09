@@ -2,10 +2,8 @@ import AppHeader from "@components/header/AppHeader";
 import TaskTable from "@components/task-table/TaskTable";
 import { Alert, Box, Button, CircularProgress, Snackbar } from "@mui/material";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import CreateTaskModal from "@/components/modal/CreateTaskModal";
 import EditTaskModal from "@/components/modal/EditTaskModal";
-import ErrorBoundary from "@/components/shared/ErrorBoundary";
 import { useCreateTask, useDeleteTask, useTasks, useUpdateTask } from "@/hooks/api/use-tasks";
 import { useAuthStore } from "@/store/auth.store";
 import { useModalStore } from "@/store/modal.store";
@@ -14,7 +12,6 @@ import type { Task } from "@/types/types";
 import { TaskPageStrings } from "./task-page.types";
 
 export default function TasksPage() {
-	// const navigate = useNavigate();
 	const { openCreateTaskModal, openEditTaskModal } = useModalStore();
 	const { getCurrentUserId } = useAuthStore();
 
@@ -37,8 +34,8 @@ export default function TasksPage() {
 	const currentUserId = getCurrentUserId();
 
 	const handleCreateTask = async (taskData: any) => {
-		console.log("handleCreateTask called with:", taskData);
 		try {
+			
 			if (!currentUserId) {
 				throw new Error("User ID is required to create a task");
 			}
@@ -47,8 +44,6 @@ export default function TasksPage() {
 				...taskData,
 				authorId: currentUserId,
 			};
-
-			console.log("Sending to API: ", taskDataWithAuthor);
 
 			await createTaskMutation.mutateAsync(taskDataWithAuthor);
 			showNotification(TaskPageStrings.CREATE_TASK_SUCCESS, "success");
@@ -62,8 +57,6 @@ export default function TasksPage() {
 		try {
 			const { id, ...updateData } = taskData;
 
-			console.log("Updating task:", id, updateData);
-
 			await updateTaskMutation.mutateAsync({
 				id: id,
 				data: updateData,
@@ -76,6 +69,7 @@ export default function TasksPage() {
 	};
 
 	const handleDeleteTask = async (id: string) => {
+		
 		if (window.confirm(TaskPageStrings.DELETE_TASK_CONFIRMATION)) {
 			try {
 				await deleteTaskMutation.mutateAsync(id);
@@ -87,9 +81,9 @@ export default function TasksPage() {
 		}
 	};
 
-  const handleEditTask = (task: Task) => {
-    openEditTaskModal(task);
-  };
+	const handleEditTask = (task: Task) => {
+		openEditTaskModal(task);
+	};
 
 	const showNotification = (message: string, severity: "success" | "error") => {
 		setNotification({ open: true, message, severity });
@@ -102,11 +96,6 @@ export default function TasksPage() {
 	const handleRetry = () => {
 		refetch();
 	};
-
-	// const handleLogout = () => {
-	//   logout();
-	//   navigate('/auth');
-	// };
 
 	if (isLoading) {
 		return (
@@ -127,7 +116,6 @@ export default function TasksPage() {
 	if (error) {
 		return (
 			<Box sx={{ p: 3 }}>
-				{/* <AppHeader onLogout={handleLogout} /> */}
 				<AppHeader />
 
 				<Alert
@@ -135,11 +123,11 @@ export default function TasksPage() {
 					sx={{ mb: 2 }}
 					action={
 						<Button color="inherit" size="small" onClick={handleRetry}>
-							Повторить
+							{TaskPageStrings.REPEAT}
 						</Button>
 					}
 				>
-					Ошибка загрузки задач: {(error as Error).message}
+					{TaskPageStrings.LOAD_TASKS_ERROR} {(error as Error).message}
 				</Alert>
 				<TaskTable
 					rows={[]}
@@ -152,37 +140,29 @@ export default function TasksPage() {
 		);
 	}
 
-	 return (
-    <Box sx={{ p: 3 }}>
-      <AppHeader />
-      
-      <TaskTable
-        rows={tasks}
-        onAddTask={openCreateTaskModal} // Используем новую функцию
-        onEditTask={handleEditTask}
-        onDeleteTask={handleDeleteTask}
-        loading={deleteTaskMutation.isPending}
-      />
+	return (
+		<Box sx={{ p: 3 }}>
+			<AppHeader />
 
-      {/* Модалка создания */}
-      <CreateTaskModal
-        onCreateTask={handleCreateTask}
-        currentUserId={currentUserId || ""}
-      />
+			<TaskTable
+				rows={tasks}
+				onAddTask={openCreateTaskModal}
+				onEditTask={handleEditTask}
+				onDeleteTask={handleDeleteTask}
+				loading={deleteTaskMutation.isPending}
+			/>
 
-      {/* Модалка редактирования */}
-      <EditTaskModal
-        onUpdateTask={handleUpdateTask}
-        currentUserId={currentUserId || ""}
-      />
+			<CreateTaskModal onCreateTask={handleCreateTask} currentUserId={currentUserId || ""} />
 
-      <Snackbar
-        open={notification.open}
-        autoHideDuration={3000}
-        onClose={handleCloseNotification}
-        message={notification.message}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      />
-    </Box>
-  );
+			<EditTaskModal onUpdateTask={handleUpdateTask} currentUserId={currentUserId || ""} />
+
+			<Snackbar
+				open={notification.open}
+				autoHideDuration={3000}
+				onClose={handleCloseNotification}
+				message={notification.message}
+				anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+			/>
+		</Box>
+	);
 }
