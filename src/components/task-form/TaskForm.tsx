@@ -111,7 +111,6 @@ export default function TaskForm({
 				/>
 			</Box>
 
-			{/* Deadline field */}
 			<FormTextField
 				field="deadline"
 				value={form.deadline || ""}
@@ -124,7 +123,6 @@ export default function TaskForm({
 				disabled={isSubmitting}
 			/>
 
-			{/* Assignees multi-select */}
 			<FormMultiSelect
 				field="assigneeIds"
 				value={form.assigneeIds || []}
@@ -138,7 +136,6 @@ export default function TaskForm({
 				disabled={isSubmitting}
 			/>
 
-			{/* Info alert about available users */}
 			{!usersLoading && users.filter((u) => u.id !== currentUserId).length > 0 && (
 				<Alert severity="info" sx={{ mt: 1 }}>
 					<Typography variant="body2">
@@ -147,7 +144,6 @@ export default function TaskForm({
 				</Alert>
 			)}
 
-			{/* Form Actions */}
 			<Box
 				sx={{
 					display: "flex",
