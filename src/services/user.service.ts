@@ -8,20 +8,13 @@ export interface UpdateUserData {
 	password?: string;
 }
 
-export interface UserFilters {
-	role?: string;
-	search?: string;
-	page?: number;
-	limit?: number;
-}
-
 export class UserService {
-	async getProfile(): Promise<User> {
+	async getCurrentUser(): Promise<User> {
 		return apiClient.get<User>("/users/profile");
 	}
 
-	async getAllUsers(filters?: UserFilters): Promise<User[]> {
-		return apiClient.get<User[]>("/users", filters);
+	async getAllUsers(): Promise<User[]> {
+		return apiClient.get<User[]>("/users");
 	}
 
 	async getUserById(id: string): Promise<User> {
@@ -41,7 +34,7 @@ export class UserService {
 	}
 
 	async updateProfile(userData: UpdateUserData): Promise<User> {
-		const profile = await this.getProfile();
+		const profile = await this.getCurrentUser();
 		return this.updateUser(profile.id, userData);
 	}
 

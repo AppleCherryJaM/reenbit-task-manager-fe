@@ -31,14 +31,17 @@ export const taskSchema = z.object({
 
 export type TaskFormValues = z.infer<typeof taskSchema>;
 
+type Status = "pending" | "in_progress" | "completed";
+type Priority = "low" | "medium" | "high";
+
 export type TaskCreateInput = {
 	title: string;
 	description?: string | null;
-	status: "pending" | "in_progress" | "completed";
-	priority: "low" | "medium" | "high";
+	status: Status;
+	priority: Priority;
 	deadline?: Date | null;
 	authorId: string;
-	assignees: { connect: { id: string }[] };
+	assigneeIds?: string[] | null;
 };
 
 export type TaskUpdateInput = Partial<Omit<TaskCreateInput, "authorId">>;

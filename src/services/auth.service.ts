@@ -44,8 +44,9 @@ export class AuthService {
 	}
 
 	async logout(): Promise<void> {
+		const refreshToken = localStorage.getItem("refreshToken");
 		try {
-			await apiClient.post("/auth/logout");
+			await apiClient.post("/auth/logout", { refreshToken });
 		} finally {
 			this.clearAuth();
 		}

@@ -1,29 +1,41 @@
 import AddIcon from "@mui/icons-material/Add";
 import { Box, Button, Stack, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import type { Task } from "@/types/types";
 import { columns } from "./TaskTable.config";
+import { type TaskTableProps, TaskTableStrings } from "./TaskTable.types";
 
 export default function TaskTable({
 	rows,
-	setOpen,
-}: {
-	rows: Task[];
-	setOpen: (open: boolean) => void;
-}) {
+	onAddTask,
+	onEditTask,
+	onDeleteTask,
+	loading = false,
+}: TaskTableProps) {
+	const enhancedColumns = columns;
+
 	return (
 		<Box sx={{ bgcolor: "#fff", p: 3, borderRadius: 3, boxShadow: 1 }}>
-			<Stack direction="row" justifyContent="space-between" mb={2}>
+			<Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
 				<Typography variant="h5" fontWeight={600}>
-					Task
+					{TaskTableStrings.TASKS_LABEL} ({rows.length})
 				</Typography>
+
+				<Button
+					startIcon={<AddIcon />}
+					onClick={onAddTask}
+					variant="contained"
+					sx={{ textTransform: "none" }}
+				>
+					{TaskTableStrings.ADD_TASK_BUTTON}
+				</Button>
 			</Stack>
 
 			<Box sx={{ height: 480 }}>
 				<DataGrid
 					rows={rows}
-					columns={columns}
+					columns={enhancedColumns}
 					disableRowSelectionOnClick
+					loading={loading}
 					sx={{
 						border: "none",
 						"& .MuiDataGrid-columnHeaders": {
@@ -33,14 +45,6 @@ export default function TaskTable({
 					}}
 				/>
 			</Box>
-
-			<Button
-				startIcon={<AddIcon />}
-				onClick={() => setOpen(true)}
-				sx={{ mt: 2, textTransform: "none" }}
-			>
-				Add task
-			</Button>
 		</Box>
 	);
 }

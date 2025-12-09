@@ -7,6 +7,7 @@ export interface ModalBaseProps {
 	primaryBtnText?: string;
 	onClose: () => void;
 	onSubmit?: () => void;
+	disableSubmit?: boolean;
 }
 
 export interface AddTaskFormValues {
@@ -14,11 +15,19 @@ export interface AddTaskFormValues {
 	priority: "low" | "medium" | "high";
 	dueDate: string;
 	tags: string;
-	assignee: string;
+	assignee: string[];
 }
 
 export interface AddTaskModalProps {
 	open: boolean;
 	onClose: () => void;
 	onSubmit: (task: AddTaskFormValues) => void;
+}
+
+export interface TaskFormData {
+	title: string;
+	priority: "low" | "medium" | "high";
+	deadline: string | null;
+	tags: string;
+	assignee: string[];
 }

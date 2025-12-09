@@ -75,7 +75,7 @@ export default function AuthForm({ mode, onSubmit, loading, onModeChange }: Auth
 			{!isLogin && (
 				<TextField
 					fullWidth
-					label="Имя"
+					label="Name	"
 					name="name"
 					value={formData.name || ""}
 					onChange={handleChange}
