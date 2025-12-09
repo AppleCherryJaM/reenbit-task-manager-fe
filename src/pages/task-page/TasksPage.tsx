@@ -10,6 +10,7 @@ import { useAuthStore } from "@/store/auth.store";
 import { useModalStore } from "@/store/modal.store";
 import type { Task } from "@/types/types";
 import { TaskPageStrings } from "./task-page.types";
+import { useNavigate } from "react-router-dom";
 
 export default function TasksPage() {
 	const navigate = useNavigate();
