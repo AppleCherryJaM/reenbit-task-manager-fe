@@ -1,23 +1,30 @@
 import type { Task } from "@/types/types";
 
-export const PriorityColor = {
-	High: "error",
-	Medium: "warning",
-	Low: "success",
-} as const;
+export enum PriorityColor {
+	High = "error",
+	Medium = "warning",
+	Low = "success",
+}
 
-export const StatusColor = {
-	"To Do": "info",
-	"In Progress": "warning",
-	Done: "success",
-} as const;
+export enum StatusColor {
+	"To Do" = "info",
+	"In Progress" = "warning",
+	"Done" = "success",
+} 
 
 export interface TaskTableProps {
-	rows: Task[];
-	onAddTask: () => void;
-	onEditTask?: (task: Task) => void;
-	onDeleteTask?: (id: string) => void;
-	loading?: boolean;
+  rows: Task[];
+  totalCount: number;
+  onAddTask: () => void;
+  onEditTask?: (task: Task) => void;
+  onDeleteTask?: (id: string) => void;
+  loading?: boolean;
+  
+  onPageChange?: (page: number) => void;
+  onPageSizeChange?: (pageSize: number) => void;
+  
+  currentPage?: number;
+  pageSize?: number;
 }
 
 export enum TaskTableStrings {

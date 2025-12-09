@@ -1,29 +1,6 @@
 import { apiClient } from "@/lib/api-client";
 import type { Task, TaskPriority, TaskStatus } from "@/types/types";
-
-export interface CreateTaskData {
-	title: string;
-	description?: string | null;
-	status?: TaskStatus;
-	priority?: TaskPriority;
-	deadline?: string | null;
-	authorId?: string;
-	assigneeIds: string[];
-}
-
-export interface UpdateTaskData extends Partial<CreateTaskData> {}
-
-export interface TaskFilters {
-	status?: TaskStatus;
-	priority?: TaskPriority;
-	assigneeId?: string;
-	authorId?: string;
-	search?: string;
-	page?: number;
-	limit?: number;
-	fromDate?: string;
-	toDate?: string;
-}
+import type { CreateTaskData, TaskFilters, TasksResponse, UpdateTaskData } from "./task-service.types";
 
 export class TaskService {
 	async createTask(taskData: CreateTaskData): Promise<Task> {
@@ -40,8 +17,8 @@ export class TaskService {
 		return apiClient.post<Task>("/tasks/new", backendData);
 	}
 
-	async getTasks(filters?: TaskFilters): Promise<Task[]> {
-		return apiClient.get<Task[]>("/tasks", filters);
+	async getTasks(filters?: TaskFilters): Promise<TasksResponse> {
+		return apiClient.get<TasksResponse>("/tasks", filters);
 	}
 
 	async getTaskById(id: string): Promise<Task> {
@@ -67,10 +44,6 @@ export class TaskService {
 
 	async updateTaskStatus(id: string, status: TaskStatus): Promise<Task> {
 		return this.updateTask(id, { status });
-	}
-
-	async updateTaskPriority(id: string, priority: TaskPriority): Promise<Task> {
-		return this.updateTask(id, { priority });
 	}
 
 	async addAssignee(taskId: string, userId: string): Promise<Task> {
