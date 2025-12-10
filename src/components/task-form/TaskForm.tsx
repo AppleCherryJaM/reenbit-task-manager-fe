@@ -1,207 +1,174 @@
 import { useTaskForm } from "@hooks/useTaskForm";
 import { useUsers } from "@hooks/useUsers";
-import {
-	Alert,
-	Box,
-	Checkbox,
-	Chip,
-	CircularProgress,
-	FormControl,
-	FormHelperText,
-	InputLabel,
-	ListItemText,
-	MenuItem,
-	OutlinedInput,
-	Select,
-	TextField,
-	Typography,
-} from "@mui/material";
+import { Alert, Box, Button, CircularProgress, Typography } from "@mui/material";
+import { FormMultiSelect } from "@/components/forms/FormMultiSelect";
+import { FormSelect } from "@/components/forms/FormSelect";
+import { FormTextField } from "@/components/forms/FormTextField";
 import type { TaskFormValues } from "@/schemas/task.schema";
-import type { User } from "@/types/types";
 import {
 	FORM_HELPER_TEXT,
 	LOADING_USERS_PLACEHOLDER,
-	MenuProps,
 	PriorityOptions,
 	StatusOptions,
 	type TaskFormProps,
 	TaskFormStrings,
-} from "./task-form.types";
+} from "./task-form.utils";
 
-export default function TaskForm({ initialData = {}, onFormChange, currentUserId }: TaskFormProps) {
-	const { form, errors, updateField, validateForm } = useTaskForm(initialData);
-	const { users, isLoading: usersLoading } = useUsers(); // ← без error
+const STATUS_OPTIONS = Object.values(StatusOptions).map((value) => ({
+	value,
+	label: value.charAt(0).toUpperCase() + value.slice(1).replace("_", " "),
+}));
 
-	const handleChange = <K extends keyof TaskFormValues>(field: K, value: TaskFormValues[K]) => {
+const PRIORITY_OPTIONS = Object.values(PriorityOptions).map((value) => ({
+	value: value.toLowerCase(),
+	label: value,
+}));
+
+export default function TaskForm({
+	onSubmit,
+	initialData = {},
+	currentUserId,
+	isSubmitting = false,
+	onClose,
+}: TaskFormProps) {
+	const { form, errors, updateField, validateForm, resetForm } = useTaskForm(initialData);
+	const { users, isLoading: usersLoading } = useUsers();
+
+	const handleChange = (field: keyof TaskFormValues, value: any): void => {
 		updateField(field, value);
-
-		setTimeout(() => {
-			const isValid = validateForm();
-			const updatedForm = { ...form, [field]: value };
-			onFormChange?.(updatedForm, isValid);
-		}, 0);
 	};
 
-	const availableUsers = users.filter((user: User) => user.id !== currentUserId);
+	const handleSubmit = async (e: React.FormEvent): Promise<void> => {
+		e.preventDefault();
 
-	const renderUsersSelectContent = () => {
-		if (usersLoading) {
-			return (
-				<MenuItem disabled>
-					<Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-						<CircularProgress size={20} />
-						<Typography>Loading users...</Typography>
-					</Box>
-				</MenuItem>
-			);
+		const isValid = validateForm();
+
+		if (!isValid) {
+			return;
 		}
 
-		if (availableUsers.length === 0) {
-			return (
-				<MenuItem disabled>
-					<Typography variant="body2" color="textSecondary">
-						No other users available
-					</Typography>
-				</MenuItem>
-			);
+		try {
+			await onSubmit(form);
+			resetForm();
+		} catch (error) {
+			console.error("Form submission error:", error);
 		}
+	};
 
-		return availableUsers.map((user: User) => (
-			<MenuItem key={user.id} value={user.id}>
-				<Checkbox checked={form.assigneeIds?.includes(user.id) ?? false} />
-				<ListItemText primary={user.name || user.email} secondary={user.name ? user.email : ""} />
-			</MenuItem>
-		));
+	const handleCancel = (): void => {
+		if (onClose) {
+			onClose();
+		}
 	};
 
 	return (
-		<Box sx={{ display: "flex", flexDirection: "column", gap: 3, pt: 1 }}>
-			{/* Title field */}
-			<TextField
-				label={TaskFormStrings.TITLE_LABEL}
+		<Box
+			component="form"
+			onSubmit={handleSubmit}
+			sx={{ display: "flex", flexDirection: "column", gap: 3, pt: 1 }}
+		>
+			<FormTextField
+				field="title"
 				value={form.title || ""}
-				onChange={(e) => handleChange("title", e.target.value)}
-				error={!!errors.title}
-				helperText={errors.title || " "}
-				fullWidth
-				variant="outlined"
+				onChange={handleChange}
+				label={TaskFormStrings.TITLE_LABEL}
+				error={errors.title}
+				helperText="Enter task title"
 				required
+				disabled={isSubmitting}
 			/>
 
-			<TextField
-				label={TaskFormStrings.DESCRIPTION_LABEL}
+			<FormTextField
+				field="description"
 				value={form.description || ""}
-				onChange={(e) => handleChange("description", e.target.value)}
-				error={!!errors.description}
-				helperText={errors.description || " "}
+				onChange={handleChange}
+				label={TaskFormStrings.DESCRIPTION_LABEL}
+				error={errors.description}
 				multiline
 				rows={3}
-				fullWidth
-				variant="outlined"
+				disabled={isSubmitting}
 			/>
 
 			<Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
-				<FormControl fullWidth error={!!errors.status}>
-					<InputLabel>{TaskFormStrings.STATUS_LABEL}</InputLabel>
-					<Select
-						value={form.status || ""}
-						label={TaskFormStrings.STATUS_LABEL}
-						onChange={(e) => handleChange("status", e.target.value)}
-					>
-						<MenuItem value="pending">{StatusOptions.PENDING}</MenuItem>
-						<MenuItem value="in_progress">{StatusOptions.IN_PROGRESS}</MenuItem>
-						<MenuItem value="completed">{StatusOptions.COMPLETED}</MenuItem>
-					</Select>
-					{errors.status && <FormHelperText>{errors.status}</FormHelperText>}
-				</FormControl>
+				<FormSelect
+					field="status"
+					value={form.status || ""}
+					onChange={handleChange}
+					options={STATUS_OPTIONS}
+					label={TaskFormStrings.STATUS_LABEL}
+					error={errors.status}
+					disabled={isSubmitting}
+				/>
 
-				<FormControl fullWidth error={!!errors.priority}>
-					<InputLabel>{TaskFormStrings.PRIORITY_LABEL}</InputLabel>
-					<Select
-						value={form.priority || ""}
-						label={TaskFormStrings.PRIORITY_LABEL}
-						onChange={(e) => handleChange("priority", e.target.value)}
-					>
-						<MenuItem value="low">{PriorityOptions.LOW}</MenuItem>
-						<MenuItem value="medium">{PriorityOptions.MEDIUM}</MenuItem>
-						<MenuItem value="high">{PriorityOptions.HIGH}</MenuItem>
-					</Select>
-					{errors.priority && <FormHelperText>{errors.priority}</FormHelperText>}
-				</FormControl>
+				<FormSelect
+					field="priority"
+					value={form.priority || ""}
+					onChange={handleChange}
+					options={PRIORITY_OPTIONS}
+					label={TaskFormStrings.PRIORITY_LABEL}
+					error={errors.priority}
+					disabled={isSubmitting}
+				/>
 			</Box>
 
-			<FormControl fullWidth error={!!errors.deadline}>
-				<TextField
-					label={TaskFormStrings.DEADLINE_LABEL}
-					type="datetime-local"
-					value={form.deadline || ""}
-					onChange={(e) => handleChange("deadline", e.target.value)}
-					InputLabelProps={{ shrink: true }}
-					helperText={errors.deadline || "Set deadline for task (optional)"}
-					variant="outlined"
-				/>
-			</FormControl>
+			<FormTextField
+				field="deadline"
+				value={form.deadline || ""}
+				onChange={handleChange}
+				label={TaskFormStrings.DEADLINE_LABEL}
+				type="datetime-local"
+				InputLabelProps={{ shrink: true }}
+				error={errors.deadline}
+				helperText="Set deadline for task (optional)"
+				disabled={isSubmitting}
+			/>
 
-			<FormControl fullWidth error={!!errors.assigneeIds}>
-				<InputLabel>{TaskFormStrings.ASSIGNEES_LABEL}</InputLabel>
-				<Select
-					multiple
-					value={form.assigneeIds || []}
-					onChange={(e) => {
-						const value = e.target.value;
-						const assigneeIds = Array.isArray(value) ? value : [value];
-						handleChange("assigneeIds", assigneeIds);
-					}}
-					input={<OutlinedInput label={TaskFormStrings.ASSIGNEES_LABEL} />}
-					renderValue={(selected: string[]) => {
-						return (
-							<Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-								{selected.map((userId: string) => {
-									const user = users.find((u: User) => u.id === userId);
-									return (
-										<Chip
-											key={userId}
-											label={user ? user.name || user.email : `User ${userId.substring(0, 8)}...`}
-											size="small"
-											onDelete={(e) => {
-												e.stopPropagation();
-												const newAssigneeIds = (form.assigneeIds || []).filter(
-													(id) => id !== userId
-												);
-												handleChange("assigneeIds", newAssigneeIds);
-											}}
-											deleteIcon={<span>×</span>}
-										/>
-									);
-								})}
-							</Box>
-						);
-					}}
-					MenuProps={MenuProps}
-					disabled={usersLoading}
-				>
-					{renderUsersSelectContent()}
-				</Select>
-				{errors.assigneeIds ? (
-					<FormHelperText error>{errors.assigneeIds}</FormHelperText>
-				) : (
-					<FormHelperText>
-						{usersLoading
-							? "Loading users..."
-							: availableUsers.length > 0
-								? "Select one or more assignees (optional)"
-								: "No other users available"}
-					</FormHelperText>
-				)}
-			</FormControl>
+			<FormMultiSelect
+				field="assigneeIds"
+				value={form.assigneeIds || []}
+				onChange={handleChange}
+				label={TaskFormStrings.ASSIGNEES_LABEL}
+				users={users}
+				isLoading={usersLoading}
+				currentUserId={currentUserId}
+				error={errors.assigneeIds}
+				helperText={usersLoading ? LOADING_USERS_PLACEHOLDER : FORM_HELPER_TEXT}
+				disabled={isSubmitting}
+			/>
 
-			{!usersLoading && availableUsers.length > 0 && (
+			{!usersLoading && users.filter((u) => u.id !== currentUserId).length > 0 && (
 				<Alert severity="info" sx={{ mt: 1 }}>
 					<Typography variant="body2">
-						Available users for assignment: {availableUsers.length}
+						Available users for assignment: {users.filter((u) => u.id !== currentUserId).length}
 					</Typography>
 				</Alert>
 			)}
+
+			<Box
+				sx={{
+					display: "flex",
+					justifyContent: "flex-end",
+					gap: 2,
+					mt: 3,
+					pt: 2,
+					borderTop: 1,
+					borderColor: "divider",
+				}}
+			>
+				{onClose && (
+					<Button type="button" onClick={handleCancel} variant="outlined" disabled={isSubmitting}>
+						Cancel
+					</Button>
+				)}
+				<Button
+					type="submit"
+					variant="contained"
+					disabled={isSubmitting}
+					startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
+				>
+					{isSubmitting ? "Submitting..." : "Submit"}
+				</Button>
+			</Box>
 		</Box>
 	);
 }

@@ -12,7 +12,7 @@ export interface ModalBaseProps {
 
 export interface AddTaskFormValues {
 	title: string;
-	priority: "low" | "medium" | "high";
+	priority: TaskPriority;
 	dueDate: string;
 	tags: string;
 	assignee: string[];
@@ -26,7 +26,7 @@ export interface AddTaskModalProps {
 
 export interface TaskFormData {
 	title: string;
-	priority: "low" | "medium" | "high";
+	priority: TaskPriority;
 	deadline: string | null;
 	tags: string;
 	assignee: string[];

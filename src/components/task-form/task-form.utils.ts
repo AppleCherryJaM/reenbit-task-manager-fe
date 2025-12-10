@@ -1,9 +1,11 @@
 import type { TaskFormValues } from "@/schemas/task.schema";
 
 export interface TaskFormProps {
+	onSubmit: (data: TaskFormValues) => Promise<void> | void;
 	initialData?: Partial<TaskFormValues>;
-	onFormChange?: (data: TaskFormValues, isValid: boolean) => void;
 	currentUserId: string;
+	isSubmitting?: boolean;
+	onClose?: () => void;
 }
 
 export const ITEM_HEIGHT = 48;

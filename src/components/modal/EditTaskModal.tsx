@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import TaskForm from "@components/task-form/TaskForm";
+import { useEffect } from "react";
 import type { TaskFormValues } from "@/schemas/task.schema";
 import { useModalStore } from "@/store/modal.store";
 import { transformTaskToFormValues } from "@/utils/task-transform.utils";
-import TaskForm from "../task-form/TaskForm";
 import ModalBase from "./ModalBase";
 
 interface EditTaskModalProps {
@@ -13,31 +13,21 @@ interface EditTaskModalProps {
 export default function EditTaskModal({ onUpdateTask, currentUserId }: EditTaskModalProps) {
 	const { isEditTaskModalOpen, editingTask, closeEditTaskModal } = useModalStore();
 
-	const [formData, setFormData] = useState<TaskFormValues | null>(null);
-	const [isFormValid, setIsFormValid] = useState(false);
-
 	useEffect(() => {
 		if (!isEditTaskModalOpen) {
-			setFormData(null);
-			setIsFormValid(false);
+			// TO DO: add a reset if needed.
 		}
 	}, [isEditTaskModalOpen]);
 
-	const handleFormChange = (data: TaskFormValues, isValid: boolean) => {
-		setFormData(data);
-		setIsFormValid(isValid);
-	};
-
-	const handleSubmit = async () => {
-		if (!formData || !isFormValid || !editingTask) {
-			console.error("Form is not valid or no task to update");
+	const handleSubmit = async (data: TaskFormValues): Promise<void> => {
+		if (!editingTask) {
 			return;
 		}
 
 		try {
 			const updateData = {
 				id: editingTask.id,
-				...formData,
+				...data,
 			};
 			await onUpdateTask(updateData);
 			closeEditTaskModal();
@@ -46,19 +36,12 @@ export default function EditTaskModal({ onUpdateTask, currentUserId }: EditTaskM
 		}
 	};
 
-	const getInitialData = (): TaskFormValues => {
-		if (editingTask) {
-			return transformTaskToFormValues(editingTask);
+	const getInitialData = (): Partial<TaskFormValues> => {
+		if (!editingTask) {
+			return {};
 		}
 
-		return {
-			title: "",
-			description: "",
-			status: "pending",
-			priority: "medium",
-			deadline: null,
-			assigneeIds: [],
-		};
+		return transformTaskToFormValues(editingTask);
 	};
 
 	if (!editingTask) {
@@ -69,15 +52,16 @@ export default function EditTaskModal({ onUpdateTask, currentUserId }: EditTaskM
 		<ModalBase
 			open={isEditTaskModalOpen}
 			onClose={closeEditTaskModal}
-			onSubmit={handleSubmit}
-			title="Редактировать задачу"
-			primaryBtnText="Сохранить"
-			disableSubmit={!isFormValid}
+			onSubmit={() => {}}
+			title="Update task"
+			primaryBtnText="Save"
+			disableSubmit={false}
 		>
 			<TaskForm
+				onSubmit={handleSubmit}
 				initialData={getInitialData()}
-				onFormChange={handleFormChange}
 				currentUserId={currentUserId}
+				onClose={closeEditTaskModal}
 			/>
 		</ModalBase>
 	);
