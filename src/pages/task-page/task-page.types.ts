@@ -6,4 +6,7 @@ export enum TaskPageStrings {
 	UPDATE_TASK_ERROR = "Error while updating task",
 	DELETE_TASK_ERROR = "Error while deleting task",
 	DELETE_TASK_CONFIRMATION = "Are you sure you want to delete this task?",
+	REPEAT = "Repeat",
+	LOAD_TASKS_ERROR = "Error loading tasks:",
+
 }
