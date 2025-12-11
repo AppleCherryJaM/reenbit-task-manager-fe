@@ -69,9 +69,11 @@ export default function CreateTaskModal({
 
     if (!csvFileSelected) {
       const fileInput = document.getElementById('csv-upload-input') as HTMLInputElement;
+      
       if (fileInput) {
         fileInput.click();
       }
+      
       return;
     }
 

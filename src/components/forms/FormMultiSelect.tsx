@@ -43,6 +43,7 @@ export const FormMultiSelect = <K extends string>({
 	const availableUsers = users.filter((user) => user.id !== currentUserId);
 
 	const renderContent = () => {
+		
 		if (isLoading) {
 			return (
 				<MenuItem disabled>

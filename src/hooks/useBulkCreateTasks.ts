@@ -13,11 +13,14 @@ export const useBulkCreateTasks = (options?: UseBulkCreateTasksOptions) => {
     mutationFn: (tasks: any[]) => taskService.bulkCreateTasks(tasks),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      if (options?.onSuccess) {
+      
+			if (options?.onSuccess) {
         options.onSuccess();
       }
+			
     },
     onError: (error) => {
+
       if (options?.onError) {
         options.onError(error);
       }

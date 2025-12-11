@@ -24,9 +24,8 @@ const PRIORITY_OPTIONS = Object.values(PriorityOptions).map((value) => ({
   label: value,
 }));
 
-// Обновляем интерфейс
 interface ExtendedTaskFormProps extends TaskFormProps {
-  showFormActions?: boolean; // Новый пропс для управления кнопками
+  showFormActions?: boolean;
 }
 
 export default function TaskForm({
@@ -35,7 +34,7 @@ export default function TaskForm({
   currentUserId,
   isSubmitting = false,
   onClose,
-  showFormActions = true, // По умолчанию показываем кнопки
+  showFormActions = true,
 }: ExtendedTaskFormProps) {
   const { form, errors, updateField, validateForm, resetForm } = useTaskForm(initialData);
   const { users, isLoading: usersLoading } = useUsers();
@@ -150,7 +149,6 @@ export default function TaskForm({
         </Alert>
       )}
 
-      {/* КНОПКИ ФОРМЫ - ПОКАЗЫВАЕМ ТОЛЬКО ЕСЛИ showFormActions=true */}
       {showFormActions && (
         <Box
           sx={{
