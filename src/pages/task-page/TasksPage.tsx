@@ -2,20 +2,20 @@ import AppHeader from "@components/header/AppHeader";
 import TaskTable from "@components/task-table/TaskTable";
 import { Alert, Box, Button, CircularProgress, Snackbar } from "@mui/material";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import CreateTaskModal from "@/components/modal/CreateTaskModal";
 import EditTaskModal from "@/components/modal/EditTaskModal";
-import ErrorBoundary from "@/components/shared/ErrorBoundary";
 import { useCreateTask, useDeleteTask, useTasks, useUpdateTask } from "@/hooks/api/use-tasks";
+import { authService } from "@/services/auth.service";
 import { useAuthStore } from "@/store/auth.store";
 import { useModalStore } from "@/store/modal.store";
-
 import type { Task } from "@/types/types";
 import { TaskPageStrings } from "./task-page.types";
+import { useNavigate } from "react-router-dom";
 
 export default function TasksPage() {
+	const navigate = useNavigate();
 	const { openCreateTaskModal, openEditTaskModal } = useModalStore();
-	const { getCurrentUserId } = useAuthStore();
+	const { getCurrentUserId, logout: logoutFromStore } = useAuthStore();
 
 	const [notification, setNotification] = useState<{
 		open: boolean;
@@ -37,6 +37,7 @@ export default function TasksPage() {
 
 	const handleCreateTask = async (taskData: any) => {
 		try {
+			
 			if (!currentUserId) {
 				throw new Error("User ID is required to create a task");
 			}
@@ -70,6 +71,7 @@ export default function TasksPage() {
 	};
 
 	const handleDeleteTask = async (id: string) => {
+		
 		if (window.confirm(TaskPageStrings.DELETE_TASK_CONFIRMATION)) {
 			try {
 				await deleteTaskMutation.mutateAsync(id);
@@ -97,6 +99,20 @@ export default function TasksPage() {
 		refetch();
 	};
 
+	const handleLogout = async () => {
+		try {
+			await authService.logout();
+
+			logoutFromStore();
+
+			navigate("/auth");
+		} catch (error) {
+			console.error("Logout failed:", error);
+			logoutFromStore();
+			navigate("/auth");
+		}
+	};
+
 	if (isLoading) {
 		return (
 			<Box
@@ -116,17 +132,18 @@ export default function TasksPage() {
 	if (error) {
 		return (
 			<Box sx={{ p: 3 }}>
-				<AppHeader />
+				<AppHeader onLogout={handleLogout} />
+
 				<Alert
 					severity="error"
 					sx={{ mb: 2 }}
 					action={
 						<Button color="inherit" size="small" onClick={handleRetry}>
-							Повторить
+							{TaskPageStrings.REPEAT}
 						</Button>
 					}
 				>
-					Ошибка загрузки задач: {(error as Error).message}
+					{TaskPageStrings.LOAD_TASKS_ERROR} {(error as Error).message}
 				</Alert>
 				<TaskTable
 					rows={[]}
@@ -141,7 +158,7 @@ export default function TasksPage() {
 
 	return (
 		<Box sx={{ p: 3 }}>
-			<AppHeader />
+			<AppHeader onLogout={handleLogout} />
 
 			<TaskTable
 				rows={tasks}
