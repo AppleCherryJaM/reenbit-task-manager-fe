@@ -6,7 +6,6 @@ import { TaskHeader } from "./components/TaskHeader";
 import { TaskPagination } from "./components/TaskPagination";
 import type { TaskTableProps } from "./TaskTable.types";
 
-
 export default function TaskTable({
   rows,
   totalCount,

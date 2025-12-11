@@ -1,5 +1,5 @@
-import { useCallback, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useCallback, useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Alert, Box, Button, CircularProgress, Snackbar } from "@mui/material";
 import AppHeader from "@components/header/AppHeader";
 import TaskTable from "@components/task-table/TaskTable";
@@ -16,6 +16,8 @@ import { mapFilterPriorityToApi, mapFilterStatusToApi } from "./task-page.helper
 
 export default function TasksPage() {
   const navigate = useNavigate();
+	const location = useLocation();
+
   const { openCreateTaskModal, openEditTaskModal } = useModalStore();
   const { getCurrentUserId, logout: logoutFromStore } = useAuthStore();
 
@@ -55,9 +57,30 @@ export default function TasksPage() {
 
   const currentUserId = getCurrentUserId();
 
-	const handlePageChange = useCallback((page: number) => {
-    setPaginationState(prev => ({ ...prev, page }));
-  }, []);
+	useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+
+    const statusFromUrl = searchParams.get('status') || 'all';
+    const priorityFromUrl = searchParams.get('priority') || 'all';
+    const pageFromUrl = parseInt(searchParams.get('page') || '0');
+    const sortFieldFromUrl = searchParams.get('sortField') || 'createdAt';
+    const sortDirectionFromUrl = (searchParams.get('sortDirection') || 'desc') as 'asc' | 'desc';
+
+    setFilterState({
+      status: statusFromUrl,
+      priority: priorityFromUrl
+    });
+    
+    setPaginationState({
+      page: pageFromUrl,
+      pageSize: 10
+    });
+    
+    setSortState({
+      field: sortFieldFromUrl,
+      direction: sortDirectionFromUrl
+    });
+  }, [location.search])
 
 	const { 
     data: response, 
@@ -73,19 +96,59 @@ export default function TasksPage() {
     priority: mapFilterPriorityToApi(filterState.priority),
   });
 
+	const updateUrl = useCallback((filters: any, pagination: any, sort: any) => {
+    const searchParams = new URLSearchParams();
+
+    if (filters.status !== 'all') {
+      searchParams.set('status', filters.status);
+    }
+    
+    if (filters.priority !== 'all') {
+      searchParams.set('priority', filters.priority);
+    }
+    
+    if (pagination.page > 0) {
+      searchParams.set('page', pagination.page.toString());
+    }
+    
+    if (sort.field !== 'createdAt') {
+      searchParams.set('sortField', sort.field);
+    }
+    
+    if (sort.direction !== 'desc') {
+      searchParams.set('sortDirection', sort.direction);
+    }
+
+    navigate({
+      pathname: location.pathname,
+      search: searchParams.toString()
+    }, { replace: true });
+  }, [navigate, location.pathname]);
+
+
   const handlePageSizeChange = useCallback((pageSize: number) => {
     setPaginationState({ page: 0, pageSize });
   }, []);
 
   const handleSortChange = useCallback((field: string, direction: 'asc' | 'desc') => {
-    setSortState({ field, direction });
+    const newSort = { field, direction };
+    setSortState(newSort);
+    updateUrl(filterState, paginationState, newSort);
     refetch();
-  }, [refetch]);
+  }, [filterState, paginationState, updateUrl, refetch]);
+
+	const handlePageChange = useCallback((page: number) => {
+    const newPagination = { ...paginationState, page };
+    setPaginationState(newPagination);
+    updateUrl(filterState, newPagination, sortState);
+  }, [filterState, paginationState, sortState, updateUrl]);
 
   const handleFilterChange = useCallback((key: string, value: string) => {
-    setFilterState(prev => ({ ...prev, [key]: value }));
+    const newFilters = { ...filterState, [key]: value };
+    setFilterState(newFilters);
+    updateUrl(newFilters, paginationState, sortState);
     refetch();
-  }, [refetch]);
+  }, [filterState, paginationState, sortState, updateUrl, refetch]);
 
   const handleCreateTask = async (taskData: any) => {
     try {
