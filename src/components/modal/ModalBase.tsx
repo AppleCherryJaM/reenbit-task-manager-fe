@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent, DialogTitle, DialogActions, Button } from "@mui/material";
 import type { ModalBaseProps } from "./Modal.types";
 
@@ -66,8 +65,9 @@ export default function ModalBase({
               onClick={handlePrimaryAction} 
               variant="contained" 
               disabled={isPrimaryDisabled || isLoading}
+              startIcon={isLoading ? null : undefined}
             >
-              {primaryBtnText}
+              {isLoading ? "Processing..." : primaryBtnText}
             </Button>
           )}
         </DialogActions>

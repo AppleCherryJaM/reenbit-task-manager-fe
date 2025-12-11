@@ -7,13 +7,19 @@ import {
   LinearProgress,
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import { parseCSVToTasks } from "@/utils/csv-parser/csv-parser";
+import DownloadIcon from "@mui/icons-material/Download";
+import { parseCSVToTasks, downloadCSVTemplate } from "@/utils/csv-parser/csv-parser";
+import type { ParsedTask } from "@/utils/csv-parser/csv-parser";
 
 interface ImportCSVSectionProps {
-  onTasksImported: (tasks: any[]) => void;
+  onTasksImported: (tasks: ParsedTask[]) => void;
+  currentUserId?: string;
 }
 
-export function ImportCSVSection({ onTasksImported }: ImportCSVSectionProps) {
+export function ImportCSVSection({ 
+  onTasksImported, 
+  currentUserId 
+}: ImportCSVSectionProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,12 +33,22 @@ export function ImportCSVSection({ onTasksImported }: ImportCSVSectionProps) {
 
     try {
       const tasks = await parseCSVToTasks(selectedFile);
-      onTasksImported(tasks);
+      const tasksWithAuthor = tasks.map(task => ({
+        ...task,
+        authorId: task.authorId || currentUserId || '',
+      }));
+
+      onTasksImported(tasksWithAuthor);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to parse CSV file");
     } finally {
       setIsLoading(false);
+      event.target.value = '';
     }
+  };
+
+  const handleDownloadTemplate = () => {
+    downloadCSVTemplate(currentUserId);
   };
 
   return (
@@ -45,6 +61,7 @@ export function ImportCSVSection({ onTasksImported }: ImportCSVSectionProps) {
         style={{ display: "none" }}
         disabled={isLoading}
       />
+      
       <Button
         component="label"
         htmlFor="csv-upload"
@@ -52,17 +69,30 @@ export function ImportCSVSection({ onTasksImported }: ImportCSVSectionProps) {
         startIcon={<CloudUploadIcon />}
         fullWidth
         disabled={isLoading}
-        sx={{ py: 2 }}
+        sx={{ py: 2, mb: 2 }}
       >
         {isLoading ? "Processing..." : "Upload CSV File"}
       </Button>
-      {isLoading && <LinearProgress sx={{ mt: 1 }} />}
-      <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: "block" }}>
-        Upload a CSV file with task data (first task will be used)
-      </Typography>
+      
+      {isLoading && <LinearProgress sx={{ mt: 1, mb: 2 }} />}
+      
+      <Box sx={{ display: "flex", flexDirection: 'column', gap: 1, mb: 2 }}>
+        <Button
+          variant="text"
+          startIcon={<DownloadIcon />}
+          onClick={handleDownloadTemplate}
+          size="small"
+        >
+          Download Template
+        </Button>
+        
+        <Typography variant="caption" color="text.secondary">
+          CSV format: title, description, status, priority, deadline, authorId, assigneeIds
+        </Typography>
+      </Box>
       
       {error && (
-        <Alert severity="error" sx={{ mt: 2 }}>
+        <Alert severity="error" sx={{ mt: 1 }}>
           {error}
         </Alert>
       )}

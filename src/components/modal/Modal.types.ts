@@ -58,12 +58,6 @@ export interface CSVTask {
   authorId?: string;
 }
 
-export interface ImportCSVSectionProps {
-  onTasksImported: (tasks: CSVTask[]) => void;
-  isLoading?: boolean;
-  error?: string | null;
-}
-
 export interface CreateTaskModalProps {
   onCreateTask: (taskData: any) => Promise<void>;
   onCreateTasksBatch?: (tasksData: any[]) => Promise<void>;
