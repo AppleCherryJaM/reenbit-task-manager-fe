@@ -1,50 +1,47 @@
-import AddIcon from "@mui/icons-material/Add";
-import { Box, Button, Stack, Typography } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { columns } from "./TaskTable.config";
-import { type TaskTableProps, TaskTableStrings } from "./TaskTable.types";
+import type { TaskTableProps } from "./TaskTable.types";
 
 export default function TaskTable({
 	rows,
 	onAddTask,
 	onEditTask,
 	onDeleteTask,
-	loading = false,
+	loading,
 }: TaskTableProps) {
-	const enhancedColumns = columns;
+	const tableColumns = columns(onEditTask, onDeleteTask);
 
 	return (
-		<Box sx={{ bgcolor: "#fff", p: 3, borderRadius: 3, boxShadow: 1 }}>
-			<Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-				<Typography variant="h5" fontWeight={600}>
-					{TaskTableStrings.TASKS_LABEL} ({rows.length})
-				</Typography>
-
-				<Button
-					startIcon={<AddIcon />}
-					onClick={onAddTask}
-					variant="contained"
-					sx={{ textTransform: "none" }}
-				>
-					{TaskTableStrings.ADD_TASK_BUTTON}
+		<Box sx={{ height: 600, width: "100%" }}>
+			<Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+				<Button variant="contained" onClick={onAddTask}>
+					Add New Task
 				</Button>
-			</Stack>
-
-			<Box sx={{ height: 480 }}>
-				<DataGrid
-					rows={rows}
-					columns={enhancedColumns}
-					disableRowSelectionOnClick
-					loading={loading}
-					sx={{
-						border: "none",
-						"& .MuiDataGrid-columnHeaders": {
-							backgroundColor: "#F3F4F6",
-							fontWeight: 600,
-						},
-					}}
-				/>
 			</Box>
+
+			<DataGrid
+				rows={rows}
+				columns={tableColumns}
+				loading={loading}
+				pageSizeOptions={[5, 10, 25]}
+				initialState={{
+					pagination: {
+						paginationModel: { pageSize: 10 },
+					},
+				}}
+				getRowId={(row) => {
+					if (!row.id) {
+						return `temp-${Math.random()}`;
+					}
+					return row.id;
+				}}
+				sx={{
+					"& .MuiDataGrid-cell:focus": {
+						outline: "none",
+					},
+				}}
+			/>
 		</Box>
 	);
 }

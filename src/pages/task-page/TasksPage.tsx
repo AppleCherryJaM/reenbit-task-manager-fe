@@ -163,6 +163,7 @@ export default function TasksPage() {
 			<TaskTable
 				rows={tasks}
 				onAddTask={openCreateTaskModal}
+				
 				onEditTask={handleEditTask}
 				onDeleteTask={handleDeleteTask}
 				loading={deleteTaskMutation.isPending}
