@@ -42,15 +42,15 @@ export default function TaskForm({
 		updateField(field, value);
 	};
 
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
+	const handleSubmit = (event: React.FormEvent): void => {
+		event.preventDefault();
 
 		if (validateForm()) {
 			onSubmit?.(form);
 		}
 	};
 
-	const handleCancel = () => {
+	const handleCancel = (): void => {
 		resetForm();
 		onClose?.();
 	};
@@ -183,7 +183,7 @@ export default function TaskForm({
 											onDelete={(e) => {
 												e.stopPropagation();
 												const newAssigneeIds = (form.assigneeIds || []).filter(
-													(id) => id !== userId
+													(id: string) => id !== userId
 												);
 												handleChange("assigneeIds", newAssigneeIds);
 											}}
@@ -219,8 +219,6 @@ export default function TaskForm({
 					</Typography>
 				</Alert>
 			)}
-
-			{/* Кнопки формы */}
 			<Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 3 }}>
 				<Button onClick={handleCancel} color="inherit">
 					Cancel

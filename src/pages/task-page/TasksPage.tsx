@@ -153,16 +153,15 @@ export default function TasksPage() {
 
 			<TaskTable
 				rows={tasks}
-				onAddTask={openCreateTaskModal} // Используем новую функцию
+				onAddTask={openCreateTaskModal}
+				
 				onEditTask={handleEditTask}
 				onDeleteTask={handleDeleteTask}
 				loading={deleteTaskMutation.isPending}
 			/>
-
-			{/* Модалка создания */}
+			
 			<CreateTaskModal onCreateTask={handleCreateTask} currentUserId={currentUserId || ""} />
-
-			{/* Модалка редактирования */}
+			
 			<EditTaskModal onUpdateTask={handleUpdateTask} currentUserId={currentUserId || ""} />
 
 			<Snackbar
