@@ -93,7 +93,6 @@ export default function TaskForm({
 			onSubmit={handleSubmit}
 			sx={{ display: "flex", flexDirection: "column", gap: 3, pt: 1 }}
 		>
-			{/* Поля формы */}
 			<TextField
 				label={TaskFormStrings.TITLE_LABEL}
 				value={form.title || ""}
