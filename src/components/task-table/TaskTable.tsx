@@ -15,7 +15,7 @@ import {
 import { DataGrid } from "@mui/x-data-grid";
 import AddIcon from "@mui/icons-material/Add";
 import { columns } from "./TaskTable.config";
-import { type TaskTableProps, TaskTableStrings } from "./TaskTable.types";
+import type { TaskTableProps } from "./TaskTable.types";
 
 export default function TaskTable({
   rows,
@@ -31,6 +31,7 @@ export default function TaskTable({
 }: TaskTableProps) {
 
   const totalPages = Math.ceil(totalCount / pageSize);
+  const tableColumns = columns(onEditTask, onDeleteTask);
 
   const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {
     onPageChange?.(page - 1);
@@ -70,8 +71,14 @@ export default function TaskTable({
       <Box sx={{ height: 400, mb: 2 }}> 
         <DataGrid
           rows={rows}
-          columns={columns}
+          columns={tableColumns}
           disableRowSelectionOnClick
+          getRowId={(row) => {
+					  if (!row.id) {
+						  return `temp-${Math.random()}`;
+					  }
+					  return row.id;
+				  }}
           loading={loading}
           onRowDoubleClick={(params) => onEditTask?.(params.row)}
           hideFooterPagination={true}

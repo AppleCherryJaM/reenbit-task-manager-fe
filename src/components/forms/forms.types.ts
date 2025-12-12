@@ -1,11 +1,7 @@
 import type { TextFieldProps } from "@mui/material";
 import type { TaskFormValues } from "@/schemas/task.schema";
 import type { User } from "@/types/types";
-
-export interface Option {
-	value: string;
-	label: string;
-}
+import type { Option } from "./select.types";
 
 export interface FormSelectProps {
 	field: keyof TaskFormValues;
