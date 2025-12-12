@@ -34,12 +34,6 @@ export default function TaskTable({
   const totalPages = Math.ceil(totalCount / pageSize);
   const tableColumns = columns(onEditTask, onDeleteTask);
 
-  const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {
-    onPageChange?.(page - 1);
-  };
-
-  const totalPages = Math.ceil(totalCount / pageSize);
-
   return (
     <Box sx={{ 
       bgcolor: "#fff", 
