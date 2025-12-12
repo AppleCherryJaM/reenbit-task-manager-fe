@@ -1,21 +1,11 @@
-import { useState } from "react";
-import { 
-  Box, 
-  Button, 
-  Stack, 
-  Typography, 
-  LinearProgress,
-  Pagination,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Box as MuiBox
-} from "@mui/material";
+import { Box } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import AddIcon from "@mui/icons-material/Add";
 import { columns } from "./TaskTable.config";
+import { TaskControls } from "./components/TaskControls";
+import { TaskHeader } from "./components/TaskHeader";
+import { TaskPagination } from "./components/TaskPagination";
 import { TaskTableStrings, type TaskTableProps } from "./TaskTable.types";
+
 
 export default function TaskTable({
   rows,
@@ -28,8 +18,19 @@ export default function TaskTable({
   onPageSizeChange,
   currentPage = 0,
   pageSize = 10,
+  onSortChange,
+  currentSort = { field: 'createdAt', direction: 'desc' },
+  onFilterChange,
+  currentFilters = { status: 'all', priority: 'all' },
 }: TaskTableProps) {
-
+  const handleRowDoubleClick = (params: any) => {
+    
+    if (onEditTask) {
+      onEditTask(params.row);
+    }
+    
+  };
+      
   const totalPages = Math.ceil(totalCount / pageSize);
   const tableColumns = columns(onEditTask, onDeleteTask);
 
@@ -37,10 +38,7 @@ export default function TaskTable({
     onPageChange?.(page - 1);
   };
 
-  const handlePageSizeChange = (event: any) => {
-    const newSize = parseInt(event.target.value, 10);
-    onPageSizeChange?.(newSize);
-  };
+  const totalPages = Math.ceil(totalCount / pageSize);
 
   return (
     <Box sx={{ 
@@ -51,24 +49,20 @@ export default function TaskTable({
       display: "flex",
       flexDirection: "column"
     }}>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h5" fontWeight={600}>
-          {TaskTableStrings.TASKS_LABEL} ({totalCount})
-        </Typography>
 
-        <Button
-          startIcon={<AddIcon />}
-          onClick={onAddTask}
-          variant="contained"
-          sx={{ textTransform: "none" }}
-        >
-          {TaskTableStrings.ADD_TASK_BUTTON}
-        </Button>
-      </Stack>
+      <TaskHeader 
+        totalCount={totalCount}
+        onAddTask={onAddTask}
+      />
 
-      {loading && <LinearProgress sx={{ mb: 1 }} />}
+      <TaskControls
+        currentSort={currentSort}
+        currentFilters={currentFilters}
+        onSortChange={onSortChange}
+        onFilterChange={onFilterChange}
+      />
 
-      <Box sx={{ height: 400, mb: 2 }}> 
+      <Box sx={{ height: 400, mb: 2, flex: 1 }}>
         <DataGrid
           rows={rows}
           columns={tableColumns}
@@ -80,71 +74,28 @@ export default function TaskTable({
 					  return row.id;
 				  }}
           loading={loading}
-          onRowDoubleClick={(params) => onEditTask?.(params.row)}
+          onRowDoubleClick={handleRowDoubleClick}
           hideFooterPagination={true}
           hideFooter={true}
-          
+          disableColumnMenu={true}
           sx={{
             border: "none",
             "& .MuiDataGrid-columnHeaders": {
               backgroundColor: "#F3F4F6",
               fontWeight: 600,
             },
-            "& .MuiDataGrid-virtualScroller": {
-              minHeight: 200,
-            },
           }}
         />
       </Box>
 
-      <Stack 
-        direction="row" 
-        justifyContent="space-between" 
-        alignItems="center" 
-        sx={{ 
-          mt: 'auto', 
-          pt: 2, 
-          borderTop: 1, 
-          borderColor: 'divider' 
-        }}
-      >
-        <Stack direction="row" spacing={2} alignItems="center">
-          <Typography variant="body2" color="text.secondary">
-            Total: {totalCount} tasks
-          </Typography>
-          
-          <FormControl size="small" sx={{ minWidth: 80 }}>
-            <Select
-              value={pageSize}
-              onChange={handlePageSizeChange}
-              size="small"
-            >
-              <MenuItem value={5}>5</MenuItem>
-              <MenuItem value={10}>10</MenuItem>
-              <MenuItem value={20}>20</MenuItem>
-              <MenuItem value={50}>50</MenuItem>
-            </Select>
-          </FormControl>
-          
-          <Typography variant="body2" color="text.secondary">
-            per page
-          </Typography>
-        </Stack>
-
-        <Pagination
-          count={totalPages}
-          page={currentPage + 1} 
-          onChange={handlePageChange}
-          color="primary"
-          size="medium"
-          showFirstButton
-          showLastButton
-        />
-
-        <Typography variant="body2" color="text.secondary">
-          Page {currentPage + 1} of {totalPages || 1}
-        </Typography>
-      </Stack>
+      <TaskPagination
+        totalCount={totalCount}
+        totalPages={totalPages}
+        currentPage={currentPage}
+        pageSize={pageSize}
+        onPageChange={onPageChange}
+        onPageSizeChange={onPageSizeChange}
+      />
     </Box>
   );
 }
