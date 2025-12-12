@@ -15,7 +15,7 @@ import {
 import { DataGrid } from "@mui/x-data-grid";
 import AddIcon from "@mui/icons-material/Add";
 import { columns } from "./TaskTable.config";
-import type { TaskTableProps } from "./TaskTable.types";
+import { TaskTableStrings, type TaskTableProps } from "./TaskTable.types";
 
 export default function TaskTable({
   rows,
