@@ -1,11 +1,21 @@
-import type { TaskFilters, UpdateTaskData } from "@services/task.service";
-import { taskService } from "@services/task.service";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { 
+	useMutation, 
+	useQuery, 
+	useQueryClient 
+} from "@tanstack/react-query";
+import { taskService } from "@/services/task-service/task.service";
+
+import type { 
+	TasksResponse, 
+	TaskFilters, 
+	UpdateTaskData 
+} from "@/services/task-service/task-service.types";
 
 export const useTasks = (filters?: TaskFilters) => {
-	return useQuery({
+	return useQuery<TasksResponse>({
 		queryKey: ["tasks", filters],
 		queryFn: () => taskService.getTasks(filters),
+		placeholderData: (previousData) => previousData,
 	});
 };
 
