@@ -1,6 +1,7 @@
 import { Delete, Edit } from "@mui/icons-material";
 import { Avatar, Chip, IconButton } from "@mui/material";
 import type { GridColDef } from "@mui/x-data-grid";
+import { Link } from "react-router-dom";
 import type { Task } from "@/types/types";
 import { PriorityColor, StatusColor, StatusLabels, TaskTableStrings } from "./TaskTable.types";
 
@@ -13,6 +14,22 @@ export const columns: (
 		headerName: TaskTableStrings.TITLE_LABEL,
 		flex: 1,
 		minWidth: 200,
+		renderCell: ({ row }) => (
+			<Link
+				to={`/tasks/${row.id}`}
+				style={{
+					textDecoration: "none",
+					color: "inherit",
+					fontWeight: 500,
+					cursor: "pointer",
+					display: "block",
+					width: "100%",
+				}}
+				onClick={(e) => e.stopPropagation()}
+			>
+				{row.title}
+			</Link>
+		),
 	},
 	{
 		field: "description",

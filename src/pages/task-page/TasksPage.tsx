@@ -125,30 +125,38 @@ export default function TasksPage() {
 
   if (isLoading) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+      <Box sx={{ p: 3, display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
         <CircularProgress />
       </Box>
     );
   }
 
   if (error) {
-    return (
-      <Box sx={{ p: 3 }}>
-        <AppHeader onLogout={handleLogout} />
-        <Alert
-          severity="error"
-          sx={{ mb: 2 }}
-          action={
-            <Button color="inherit" size="small" onClick={handleRetry}>
-              {TaskPageStrings.REPEAT}
-            </Button>
-          }
-        >
-          {TaskPageStrings.LOAD_TASKS_ERROR} {(error as Error).message}
-        </Alert>
-      </Box>
-    );
-  }
+		return (
+			<Box sx={{ p: 3 }}>
+				<AppHeader onLogout={handleLogout} />
+
+				<Alert
+					severity="error"
+					sx={{ mb: 2 }}
+					action={
+						<Button color="inherit" size="small" onClick={handleRetry}>
+							{TaskPageStrings.REPEAT}
+						</Button>
+					}
+				>
+					{TaskPageStrings.LOAD_TASKS_ERROR} {(error as Error).message}
+				</Alert>
+				<TaskTable
+					rows={[]}
+					onAddTask={openCreateTaskModal}
+					onEditTask={handleEditTask}
+					onDeleteTask={handleDeleteTask}
+					loading={false}
+				/>
+			</Box>
+		);
+	}
 
   const tasks = response?.tasks || [];
   const pagination = response?.pagination;
