@@ -16,7 +16,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import EditTaskModal from "@/components/modal/EditTaskModal";
 import { PriorityColor, StatusColor, StatusLabels } from "@/components/task-table/TaskTable.types";
 import { useDeleteTask, useUpdateTask } from "@/hooks/api/use-tasks";
-import { taskService } from "@/services/task.service";
+import { taskService } from "@/services/task-service/task.service";
 import { useModalStore } from "@/store/modal.store";
 import type { Task } from "@/types/types";
 
