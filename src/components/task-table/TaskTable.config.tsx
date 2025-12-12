@@ -64,10 +64,11 @@ export const columns: (
 		headerName: TaskTableStrings.STATUS_LABEL,
 		flex: 1,
 		minWidth: 150,
-		renderCell: ({ row }) => {
-			const status = row?.status;
+		renderCell: (params) => {
+			const status = params.value as string;
+
 			if (!status) {
-				return "-";
+				return TaskTableStrings.NONE;
 			}
 
 			const statusText = StatusLabels[status as keyof typeof StatusLabels] || status;
@@ -89,13 +90,10 @@ export const columns: (
 		minWidth: 120,
 		valueFormatter: (value) => {
 			if (!value) {
-				return "-";
+				return TaskTableStrings.NONE;
 			}
-			try {
-				return new Date(value).toLocaleDateString();
-			} catch {
-				return "-";
-			}
+
+			return new Date(value).toLocaleDateString();
 		},
 	},
 	{
@@ -103,10 +101,18 @@ export const columns: (
 		headerName: TaskTableStrings.ASSIGNEES_LABEL,
 		flex: 1,
 		minWidth: 120,
-		renderCell: ({ row }) => {
-			const assignees = row?.assignees || [];
+		valueFormatter: (assignees: Array<{ name?: string; email: string }> | null) => {
+			if (!assignees || assignees.length === 0) {
+				return TaskTableStrings.NONE;
+			}
+
+			return assignees.map((user) => user.name || user.email).join(", ");
+		},
+		renderCell: (params) => {
+			const assignees = params.row.assignees || [];
+
 			if (assignees.length === 0) {
-				return "-";
+				return TaskTableStrings.NONE;
 			}
 
 			return (

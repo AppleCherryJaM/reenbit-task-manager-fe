@@ -1,4 +1,5 @@
 export const formatDateForInput = (date: Date | string | null | undefined): string => {
+	
 	if (!date) {
 		return "";
 	}
@@ -12,9 +13,11 @@ export const formatDateForInput = (date: Date | string | null | undefined): stri
 		}
 
 		const localDate = new Date(dateObj.getTime() - dateObj.getTimezoneOffset() * 60000);
+
 		return localDate.toISOString().slice(0, 16);
 	} catch (error) {
 		console.error("Error formatting date:", error, date);
+
 		return "";
 	}
 };
