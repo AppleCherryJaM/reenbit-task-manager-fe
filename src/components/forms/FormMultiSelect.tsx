@@ -15,6 +15,8 @@ import {
 import type { SelectChangeEvent } from "@mui/material/Select";
 import type { FormMultiSelectProps } from "./forms.types";
 
+const maxHeight = 48 * 4.5 + 8;
+
 export const FormMultiSelect = <K extends string>({
 	field,
 	value,
@@ -55,7 +57,7 @@ export const FormMultiSelect = <K extends string>({
 			);
 		}
 
-		if (availableUsers.length === 0) {
+		if (availableUsers.length) {
 			return (
 				<MenuItem disabled>
 					<Typography variant="body2" color="textSecondary">
@@ -100,7 +102,7 @@ export const FormMultiSelect = <K extends string>({
 				MenuProps={{
 					PaperProps: {
 						style: {
-							maxHeight: 48 * 4.5 + 8,
+							maxHeight: maxHeight,
 							width: 250,
 						},
 					},

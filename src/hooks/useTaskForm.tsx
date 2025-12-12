@@ -1,6 +1,6 @@
 import { getDefaultDeadline } from "@utils/date.utils";
 import { useCallback, useState } from "react";
-import { type TaskFormValues, taskSchema } from "@/schemas/task.schema";
+import type { TaskFormValues } from "@/schemas/task.schema";
 
 const defaultDeadline = 24;
 
@@ -27,15 +27,15 @@ export const useTaskForm = (initialData: Partial<TaskFormValues> = {}) => {
 
 	const validateForm = useCallback((): boolean => {
 		const newErrors: Partial<Record<keyof TaskFormValues, string>> = {};
-		let isValid = true;
+		// let isValid = true;
 
 		if (!form.title?.trim()) {
 			newErrors.title = "Title is required";
-			isValid = false;
+			// isValid = false;
 		}
 
 		setErrors(newErrors);
-		return isValid;
+		return Object.keys(newErrors).length === 0;
 	}, [form]);
 
 	const resetForm = () => {
