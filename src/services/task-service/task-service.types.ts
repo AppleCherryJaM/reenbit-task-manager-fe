@@ -7,7 +7,7 @@ export interface CreateTaskData {
 	priority?: TaskPriority;
 	deadline?: string | null;
 	authorId?: string;
-	assigneeIds: string[];
+	assigneeIds?: string[] | undefined;
 }
 
 export interface UpdateTaskData extends Partial<CreateTaskData> {}
@@ -36,4 +36,19 @@ export interface TasksResponse {
 		hasNext: boolean;
 		hasPrev: boolean;
 	};
+}
+
+export interface BulkCreateTaskData {
+  tasks: CreateTaskData[];
+}
+
+export interface BulkTaskResult {
+  success: Task[];
+  errors: Array<{
+    task: CreateTaskData;
+    error: string;
+  }>;
+  total: number;
+  created: number;
+  failed: number;
 }

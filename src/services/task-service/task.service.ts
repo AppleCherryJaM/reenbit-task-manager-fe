@@ -1,8 +1,9 @@
 import { apiClient } from "@/lib/api-client";
 import type { Task, TaskPriority, TaskStatus } from "@/types/types";
-import type { CreateTaskData, TaskFilters, TasksResponse, UpdateTaskData } from "./task-service.types";
+import type { BulkCreateTaskData, BulkTaskResult, CreateTaskData, TaskFilters, TasksResponse, UpdateTaskData } from "./task-service.types";
 
 export class TaskService {
+
 	async createTask(taskData: CreateTaskData): Promise<Task> {
 		const backendData = {
 			title: taskData.title,
@@ -17,6 +18,12 @@ export class TaskService {
 		return apiClient.post<Task>("/tasks/new", backendData);
 	}
 
+	async bulkCreateTasks(tasks: CreateTaskData[]): Promise<BulkTaskResult> {
+    const backendData: BulkCreateTaskData = { tasks };
+    
+    return apiClient.post<BulkTaskResult>("/tasks/bulk", backendData);
+  }
+	
 	async getTasks(filters?: TaskFilters): Promise<TasksResponse> {
 		return apiClient.get<TasksResponse>("/tasks", filters);
 	}

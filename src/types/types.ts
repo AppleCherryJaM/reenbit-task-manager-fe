@@ -12,6 +12,16 @@ export interface User {
 	createdAt: Date;
 }
 
+export interface TaskCreateData {
+  title: string;
+  description?: string;
+  status?: TaskStatus;
+  priority?: TaskPriority;
+  deadline?: string | null;
+  authorId: string;
+  assigneeIds?: string[];
+}
+
 export interface Task {
 	id: string;
 	title: string;

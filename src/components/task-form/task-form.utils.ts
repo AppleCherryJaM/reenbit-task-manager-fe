@@ -8,6 +8,17 @@ export interface TaskFormProps {
 	onClose?: () => void;
 }
 
+export interface CSVImportViewRef {
+	triggerUpload: () => Promise<void>;
+}
+
+export interface CSVImportViewProps {
+	currentUserId: string;
+	onBulkCreate: (tasks: any[]) => Promise<void>;
+	isLoading: boolean;
+	onFileSelected?: (hasFile: boolean) => void;
+}
+
 export const ITEM_HEIGHT = 48;
 
 export const ITEM_PADDING_TOP = 8;
@@ -34,6 +45,11 @@ export enum TaskFormStrings {
 	ASSIGNEES_LABEL = "Assignees",
 }
 
+export enum CSVFormStrings {
+	CSV_FORMAT = "CSV format: title, description, status, priority, deadline, authorId, assigneeIds",
+
+}
+
 export enum StatusOptions {
 	PENDING = "pending",
 	IN_PROGRESS = "in_progress",
@@ -45,3 +61,4 @@ export enum PriorityOptions {
 	MEDIUM = "Medium",
 	HIGH = "High",
 }
+

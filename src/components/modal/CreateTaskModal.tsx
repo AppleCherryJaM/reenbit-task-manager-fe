@@ -1,73 +1,156 @@
-import { useEffect, useState } from "react";
+import { useState, useRef, useState } from "react";
 import type { TaskFormValues } from "@/schemas/task.schema";
 import { useModalStore } from "@/store/modal.store";
 import { transformFormToCreateData } from "@/utils/task-transform.utils";
-import TaskForm from "../task-form/TaskForm";
+import TaskForm from "@components/task-form/TaskForm";
 import ModalBase from "./ModalBase";
+import { 
+  Box, 
+  Alert,
+  Typography,
+  Switch,
+  FormControlLabel
+} from "@mui/material";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import AddIcon from "@mui/icons-material/Add";
+import { useBulkCreateTasks } from "@/hooks/useBulkCreateTasks";
+import { CSVImportView } from "@components/task-form/CSVImportView";
+import type { CSVImportViewRef } from "@components/task-form/task-form.utils";
 
 interface CreateTaskModalProps {
-	onCreateTask: (taskData: any) => Promise<void>;
-	currentUserId: string;
+  onCreateTask: (taskData: any) => Promise<void>;
+  currentUserId: string;
 }
 
-export default function CreateTaskModal({ onCreateTask, currentUserId }: CreateTaskModalProps) {
-	const { isCreateTaskModalOpen, closeCreateTaskModal } = useModalStore();
+export default function CreateTaskModal({ 
+  onCreateTask, 
+  currentUserId 
+}: CreateTaskModalProps) {
+  const { isCreateTaskModalOpen, closeCreateTaskModal } = useModalStore();
+  const [useCSV, setUseCSV] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [csvFileSelected, setCsvFileSelected] = useState(false);
 
-	const [formData, setFormData] = useState<TaskFormValues | null>(null);
-	const [isFormValid, setIsFormValid] = useState(false);
+  const csvImportRef = useRef<CSVImportViewRef>(null);
 
-	useEffect(() => {
-		if (!isCreateTaskModalOpen) {
-			setFormData(null);
-			setIsFormValid(false);
-		}
-	}, [isCreateTaskModalOpen]);
+  const bulkCreateMutation = useBulkCreateTasks({
+    onSuccess: () => {
+      closeCreateTaskModal();
+      setUseCSV(false);
+      setCsvFileSelected(false);
+    },
+  });
 
-	const handleFormChange = (data: TaskFormValues, isValid: boolean) => {
-		setFormData(data);
-		setIsFormValid(isValid);
-	};
+  const handleSubmit = async (formValues: TaskFormValues): Promise<void> => {
+    setIsSubmitting(true);
+    try {
+      const apiData = transformFormToCreateData(formValues, currentUserId);
+      await onCreateTask(apiData);
+      closeCreateTaskModal();
+    } catch (error) {
+      console.error("Failed to create task:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
-	const handleSubmit = async () => {
-		if (!formData || !isFormValid) {
-			console.error("Form is not valid");
-			return;
-		}
+  const handleBulkCreate = async (tasks: any[]) => {
+    await bulkCreateMutation.mutateAsync(tasks);
+  };
 
-		try {
-			const apiData = transformFormToCreateData(formData, currentUserId);
-			await onCreateTask(apiData);
-			closeCreateTaskModal();
-		} catch (error) {
-			console.error("Failed to create task:", error);
-		}
-	};
+  const handleCloseModal = () => {
+    closeCreateTaskModal();
+    setUseCSV(false);
+    setIsSubmitting(false);
+    setCsvFileSelected(false);
+  };
 
-	const getInitialData = (): TaskFormValues => {
-		return {
-			title: "",
-			description: "",
-			status: "pending",
-			priority: "medium",
-			deadline: null,
-			assigneeIds: [],
-		};
-	};
+  const handleCsvSubmit = async () => {
 
-	return (
-		<ModalBase
-			open={isCreateTaskModalOpen}
-			onClose={closeCreateTaskModal}
-			onSubmit={handleSubmit}
-			title="Создать новую задачу"
-			primaryBtnText="Создать"
-			disableSubmit={!isFormValid}
-		>
-			<TaskForm
-				initialData={getInitialData()}
-				onFormChange={handleFormChange}
-				currentUserId={currentUserId}
-			/>
-		</ModalBase>
-	);
+    if (!csvFileSelected) {
+      const fileInput = document.getElementById('csv-upload-input') as HTMLInputElement;
+      
+      if (fileInput) {
+        fileInput.click();
+      }
+      
+      return;
+    }
+
+    if (csvImportRef.current) {
+      await csvImportRef.current.triggerUpload();
+    }
+  };
+
+  return (
+    <ModalBase
+      open={isCreateTaskModalOpen}
+      onClose={handleCloseModal}
+      title={useCSV ? "Bulk Create from CSV" : "Create New Task"}
+      showActions={true}
+      primaryBtnText={useCSV ? "Upload CSV" : "Create Task"}
+      secondaryBtnText="Cancel"
+      onPrimaryAction={useCSV ? handleCsvSubmit : () => document.querySelector('form')?.requestSubmit()}
+      onSecondaryAction={handleCloseModal}
+      disablePrimary={
+        useCSV 
+          ? bulkCreateMutation.isPending 
+          : isSubmitting
+      }
+      isLoading={isSubmitting || bulkCreateMutation.isPending}
+      maxWidth="sm"
+    >
+      <Box sx={{ width: "100%" }}>
+        <Box sx={{ mb: 3 }}>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={useCSV}
+                onChange={(e) => setUseCSV(e.target.checked)}
+                color="primary"
+              />
+            }
+            label={
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                {useCSV ? (
+                  <>
+                    <CloudUploadIcon fontSize="small" />
+                    <Typography>Bulk Create from CSV</Typography>
+                  </>
+                ) : (
+                  <>
+                    <AddIcon fontSize="small" />
+                    <Typography>Create Single Task</Typography>
+                  </>
+                )}
+              </Box>
+            }
+          />
+        </Box>
+
+        {useCSV ? (
+          <CSVImportView
+            ref={csvImportRef}
+            currentUserId={currentUserId}
+            onBulkCreate={handleBulkCreate}
+            isLoading={bulkCreateMutation.isPending}
+            onFileSelected={(hasFile) => setCsvFileSelected(hasFile)}
+          />
+        ) : (
+          <TaskForm
+            onSubmit={handleSubmit}
+            currentUserId={currentUserId}
+            isSubmitting={isSubmitting}
+            showFormActions={false}
+          />
+        )}
+
+        {bulkCreateMutation.error && (
+          <Alert severity="error" sx={{ mt: 2 }}>
+            {bulkCreateMutation.error.message}
+          </Alert>
+        )}
+      </Box>
+    </ModalBase>
+  );
 }
