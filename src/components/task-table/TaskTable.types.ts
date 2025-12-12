@@ -59,11 +59,16 @@ export interface TaskPaginationProps {
   onPageSizeChange?: (pageSize: number) => void;
 }
 
-export interface TaskTableProps extends 
-  BaseTaskTableProps, 
-  PaginationProps, 
-  SortProps, 
-  FilterProps {}
+export interface TaskTableProps extends BaseTaskTableProps, PaginationProps, SortProps, FilterProps {
+  onUrlUpdate?: (params: Record<string, string | number>) => void;
+  urlParams?: {
+    status: string;
+    priority: string;
+    page: number;
+    sortField: string;
+    sortDirection: 'asc' | 'desc';
+  };
+}
 
 export enum PriorityColor {
 	High = "error",
