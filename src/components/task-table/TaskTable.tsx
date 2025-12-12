@@ -4,7 +4,7 @@ import { columns } from "./TaskTable.config";
 import { TaskControls } from "./components/TaskControls";
 import { TaskHeader } from "./components/TaskHeader";
 import { TaskPagination } from "./components/TaskPagination";
-import type { TaskTableProps } from "./TaskTable.types";
+import { TaskTableStrings, type TaskTableProps } from "./TaskTable.types";
 
 
 export default function TaskTable({
@@ -29,6 +29,13 @@ export default function TaskTable({
       onEditTask(params.row);
     }
     
+  };
+      
+  const totalPages = Math.ceil(totalCount / pageSize);
+  const tableColumns = columns(onEditTask, onDeleteTask);
+
+  const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {
+    onPageChange?.(page - 1);
   };
 
   const totalPages = Math.ceil(totalCount / pageSize);
@@ -58,8 +65,14 @@ export default function TaskTable({
       <Box sx={{ height: 400, mb: 2, flex: 1 }}>
         <DataGrid
           rows={rows}
-          columns={columns.map(col => ({ ...col, sortable: false }))}
+          columns={tableColumns}
           disableRowSelectionOnClick
+          getRowId={(row) => {
+					  if (!row.id) {
+						  return `temp-${Math.random()}`;
+					  }
+					  return row.id;
+				  }}
           loading={loading}
           onRowDoubleClick={handleRowDoubleClick}
           hideFooterPagination={true}

@@ -4,6 +4,7 @@ import type { RouteConfig } from "@/types/types";
 
 const AuthPage = lazy(() => import("@/pages/auth-page/AuthPage"));
 const TasksPage = lazy(() => import("@/pages/task-page/TasksPage"));
+const TaskDetailPage = lazy(() => import("@/pages/task-detail-page/TaskDetailPage"));
 
 export const routes: RouteConfig[] = [
 	{
@@ -18,6 +19,10 @@ export const routes: RouteConfig[] = [
 		path: "/tasks",
 		element: <TasksPage />,
 		auth: true,
+	},
+	{
+		path: "/tasks/:id",
+		element: <TaskDetailPage />,
 	},
 	{
 		path: "*",
