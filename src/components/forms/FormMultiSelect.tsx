@@ -57,7 +57,7 @@ export const FormMultiSelect = <K extends string>({
 			);
 		}
 
-		if (availableUsers.length) {
+		if (!availableUsers.length) {
 			return (
 				<MenuItem disabled>
 					<Typography variant="body2" color="textSecondary">
