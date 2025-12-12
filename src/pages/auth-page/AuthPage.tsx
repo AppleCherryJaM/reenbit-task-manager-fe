@@ -19,6 +19,7 @@ export default function AuthPage() {
     setError(null);
 
     try {
+			// biome-ignore lint/suspicious/noImplicitAnyLet: <explanation>
       let response;	
 
       if (mode === "login") {
