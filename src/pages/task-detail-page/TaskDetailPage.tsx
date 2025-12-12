@@ -51,13 +51,13 @@ export default function TaskDetailPage() {
 		}
 	}, [id, fetchTask]);
 
-	const handleEdit = () => {
+	const handleEdit = (): void => {
 		if (task) {
 			openEditTaskModal(task);
 		}
 	};
 
-	const handleDelete = async () => {
+	const handleDelete = async (): Promise<void> => {
 		if (task && window.confirm("Are you sure you want to delete this task?")) {
 			try {
 				await deleteTaskMutation.mutateAsync(task.id);
@@ -69,14 +69,13 @@ export default function TaskDetailPage() {
 		}
 	};
 
-	const handleUpdateTask = async (taskData: any) => {
+	const handleUpdateTask = async (taskData: any): Promise<void> => {
 		try {
 			const { id, ...updateData } = taskData;
 			await updateTaskMutation.mutateAsync({
 				id: id,
 				data: updateData,
 			});
-			// После обновления перезагружаем задачу
 			fetchTask(id);
 		} catch (error) {
 			console.error("Update task error:", error);
@@ -99,7 +98,6 @@ export default function TaskDetailPage() {
 			return "No deadline";
 		}
 
-		// Проверяем что дата валидна
 		if (isNaN(date.getTime())) {
 			return "Invalid date";
 		}
@@ -140,12 +138,9 @@ export default function TaskDetailPage() {
 
 	return (
 		<Container maxWidth="md" sx={{ py: 3 }}>
-			{/* Кнопка назад */}
 			<Button startIcon={<ArrowBack />} onClick={() => navigate("/tasks")} sx={{ mb: 3 }}>
 				Back to Tasks
 			</Button>
-
-			{/* Заголовок и кнопки действий */}
 			<Paper elevation={2} sx={{ p: 3, mb: 3 }}>
 				<Box
 					sx={{
@@ -176,8 +171,6 @@ export default function TaskDetailPage() {
 						</Button>
 					</Box>
 				</Box>
-
-				{/* Статус и приоритет */}
 				<Box sx={{ display: "flex", gap: 2, mb: 3, flexWrap: "wrap" }}>
 					<Chip
 						label={StatusLabels[task.status as keyof typeof StatusLabels] || task.status}
@@ -190,8 +183,6 @@ export default function TaskDetailPage() {
 						variant="outlined"
 					/>
 				</Box>
-
-				{/* Дедлайн */}
 				<Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 3 }}>
 					<AccessTime fontSize="small" />
 					<Typography>
@@ -200,8 +191,6 @@ export default function TaskDetailPage() {
 				</Box>
 
 				<Divider sx={{ my: 3 }} />
-
-				{/* Описание */}
 				<Box sx={{ mb: 4 }}>
 					<Typography variant="h6" gutterBottom>
 						Description
@@ -212,8 +201,6 @@ export default function TaskDetailPage() {
 						</Typography>
 					</Paper>
 				</Box>
-
-				{/* Исполнители */}
 				<Box sx={{ mb: 4 }}>
 					<Typography
 						variant="h6"
@@ -244,7 +231,6 @@ export default function TaskDetailPage() {
 					)}
 				</Box>
 
-				{/* Автор */}
 				<Box>
 					<Typography variant="h6" gutterBottom>
 						Created By
@@ -261,8 +247,6 @@ export default function TaskDetailPage() {
 						</Box>
 					</Box>
 				</Box>
-
-				{/* Дополнительная информация */}
 				<Divider sx={{ my: 3 }} />
 				<Box
 					sx={{
@@ -276,8 +260,6 @@ export default function TaskDetailPage() {
 					<Typography variant="body2">ID: {task.id.substring(0, 8)}...</Typography>
 				</Box>
 			</Paper>
-
-			{/* Модалка редактирования */}
 			<EditTaskModal onUpdateTask={handleUpdateTask} currentUserId={task.authorId} />
 		</Container>
 	);

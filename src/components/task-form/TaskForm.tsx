@@ -93,7 +93,6 @@ export default function TaskForm({
 			onSubmit={handleSubmit}
 			sx={{ display: "flex", flexDirection: "column", gap: 3, pt: 1 }}
 		>
-			{/* Поля формы */}
 			<TextField
 				label={TaskFormStrings.TITLE_LABEL}
 				value={form.title || ""}
@@ -219,8 +218,7 @@ export default function TaskForm({
 					</Typography>
 				</Alert>
 			)}
-
-			{/* Кнопки формы */}
+			
 			<Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 3 }}>
 				<Button onClick={handleCancel} color="inherit">
 					Cancel
