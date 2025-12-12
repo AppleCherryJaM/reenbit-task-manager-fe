@@ -12,31 +12,17 @@ interface EditTaskModalProps {
 
 export default function EditTaskModal({ onUpdateTask, currentUserId }: EditTaskModalProps) {
 	const { isEditTaskModalOpen, editingTask, closeEditTaskModal } = useModalStore();
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
-	const [formData, setFormData] = useState<TaskFormValues | null>(null);
-	const [isFormValid, setIsFormValid] = useState(false);
+	const handleSubmit = async (formData: TaskFormValues) => {
 
-	useEffect(() => {
-
-		if (!isEditTaskModalOpen) {
-			setFormData(null);
-			setIsFormValid(false);
-		}
-	}, [isEditTaskModalOpen]);
-
-	const handleFormChange = (data: TaskFormValues, isValid: boolean) => {
-		setFormData(data);
-		setIsFormValid(isValid);
-	};
-
-	const handleSubmit = async () => {
-
-		if (!formData || !isFormValid || !editingTask) {
+		if (!editingTask) {
 			console.error("Form is not valid or no task to update");
 			return;
 		}
 
 		try {
+			setIsSubmitting(true);
 			const updateData = {
 				id: editingTask.id,
 				...formData,
@@ -45,6 +31,8 @@ export default function EditTaskModal({ onUpdateTask, currentUserId }: EditTaskM
 			closeEditTaskModal();
 		} catch (error) {
 			console.error("Failed to update task:", error);
+		} finally {
+			setIsSubmitting(false);
 		}
 	};
 
@@ -72,15 +60,14 @@ export default function EditTaskModal({ onUpdateTask, currentUserId }: EditTaskM
 		<ModalBase
 			open={isEditTaskModalOpen}
 			onClose={closeEditTaskModal}
-			onSubmit={handleSubmit}
 			title="Редактировать задачу"
-			primaryBtnText="Сохранить"
-			disableSubmit={!isFormValid}
 		>
 			<TaskForm
 				initialData={getInitialData()}
-				onFormChange={handleFormChange}
+				onSubmit={handleSubmit}
 				currentUserId={currentUserId}
+				isSubmitting={isSubmitting}
+				onClose={closeEditTaskModal}
 			/>
 		</ModalBase>
 	);
