@@ -1,5 +1,5 @@
 import TaskForm from "@components/task-form/TaskForm";
-import { useEffect, useState } from "react";
+import { useState, useRef } from "react";
 import type { TaskFormValues } from "@/schemas/task.schema";
 import { useModalStore } from "@/store/modal.store";
 import { transformTaskToFormValues } from "@/utils/task-transform.utils";
@@ -59,8 +59,9 @@ export default function EditTaskModal({ onUpdateTask, currentUserId }: EditTaskM
 	return (
 		<ModalBase
 			open={isEditTaskModalOpen}
-			onClose={closeEditTaskModal}
-			title="Редактировать задачу"
+			onClose={(closeEditTaskModal)}
+			showActions={false}
+			title="Update Task"
 		>
 			<TaskForm
 				initialData={getInitialData()}
