@@ -82,7 +82,6 @@ class ApiClient {
 					} catch (refreshError) {
 						this.processQueue(refreshError, null);
 						this.clearTokens();
-						window.location.href = "/login";
 						return Promise.reject(refreshError);
 					} finally {
 						this.isRefreshing = false;

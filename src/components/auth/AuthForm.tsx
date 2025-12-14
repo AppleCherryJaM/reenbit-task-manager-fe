@@ -23,8 +23,8 @@ enum AuthFormStrings {
 	REGISTER_TITLE = "Register",
 	LOGIN_BUTTON = "Login",
 	REGISTER_BUTTON = "Register",
-	SWITCH_TO_REGISTER = "Don't have an account? Register",
-	SWITCH_TO_LOGIN = "Already have an account? Login",
+	SWITCH_TO_REGISTER = "Don't have an account?",
+	SWITCH_TO_LOGIN = "Already have an account?",
 	PASSWORD_LABEL = "Password",
 	CONFIRM_PASSWORD_LABEL = "Confirm Password",
 	EMAIL_LABEL = "Email",
@@ -193,7 +193,7 @@ export default function AuthForm({ mode, onSubmit, loading, onModeChange }: Auth
 						sx={{ cursor: "pointer" }}
 						disabled={loading}
 					>
-						{isLogin ? AuthFormStrings.LOGIN_BUTTON : AuthFormStrings.REGISTER_BUTTON}
+						{isLogin ? AuthFormStrings.REGISTER_BUTTON : AuthFormStrings.LOGIN_BUTTON}
 					</Link>
 				</Typography>
 			</Box>
