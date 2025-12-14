@@ -5,6 +5,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { BrowserRouter as Router } from "react-router-dom";
 import { theme } from "./providers/theme.provider";
 import MainRouter from "./router/MainRouter";
+import { ToastProvider } from "./providers/ToastProvider";
 
 const queryClient = new QueryClient({
 	defaultOptions: {
@@ -22,7 +23,9 @@ function App() {
 			<ThemeProvider theme={theme}>
 				<CssBaseline />
 				<Router>
-					<MainRouter />
+					<ToastProvider>
+						<MainRouter />
+					</ToastProvider>
 				</Router>
 			</ThemeProvider>
 			<ReactQueryDevtools initialIsOpen={false} />

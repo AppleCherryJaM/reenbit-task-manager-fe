@@ -10,6 +10,7 @@ import {
 	Typography,
 } from "@mui/material";
 import { type AuthMode, useAuthForm } from "@/hooks/auth/useAuthForm";
+import { useToast } from "@/providers/ToastProvider";
 
 interface AuthFormProps {
 	mode: AuthMode;
@@ -46,6 +47,8 @@ export default function AuthForm({ mode, onSubmit, loading, onModeChange }: Auth
 		resetForm,
 	} = useAuthForm(mode);
 
+	const { showToast } = useToast();
+
 	const isLogin = mode === "login";
 
 	const handleSubmit = async (e: React.FormEvent) => {
@@ -56,7 +59,12 @@ export default function AuthForm({ mode, onSubmit, loading, onModeChange }: Auth
 				? { email: formData.email, password: formData.password }
 				: { ...formData, name: formData.name || "" };
 
-			await onSubmit(data);
+			try {
+        await onSubmit(data);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Authentication failed";
+        showToast(message, "error");
+      }
 		}
 	};
 

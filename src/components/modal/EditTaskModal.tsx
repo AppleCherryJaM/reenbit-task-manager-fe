@@ -4,6 +4,7 @@ import type { TaskFormValues } from "@/schemas/task.schema";
 import { useModalStore } from "@/store/modal.store";
 import { transformTaskToFormValues } from "@/utils/task-transform.utils";
 import ModalBase from "./ModalBase";
+import { useToast } from "@/providers/ToastProvider";
 
 interface EditTaskModalProps {
 	onUpdateTask: (taskData: any) => Promise<void>;
@@ -13,11 +14,11 @@ interface EditTaskModalProps {
 export default function EditTaskModal({ onUpdateTask, currentUserId }: EditTaskModalProps) {
 	const { isEditTaskModalOpen, editingTask, closeEditTaskModal } = useModalStore();
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const { showToast } = useToast();
 
 	const handleSubmit = async (formData: TaskFormValues) => {
 
 		if (!editingTask) {
-			console.error("Form is not valid or no task to update");
 			return;
 		}
 
@@ -29,8 +30,10 @@ export default function EditTaskModal({ onUpdateTask, currentUserId }: EditTaskM
 			};
 			await onUpdateTask(updateData);
 			closeEditTaskModal();
+			showToast("Task updated successfully", "success");
 		} catch (error) {
-			console.error("Failed to update task:", error);
+			const message = error instanceof Error ? error.message : "Failed to update task";
+      showToast(message, "error");
 		} finally {
 			setIsSubmitting(false);
 		}
