@@ -1,6 +1,6 @@
 import ClearIcon from "@mui/icons-material/Clear";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import { Box, Button, FormControl, MenuItem, Select, Stack } from "@mui/material";
+import { Box, Button, FormControl, MenuItem, Select, Stack, useTheme, useMediaQuery } from "@mui/material";
 import {
 	type TaskFiltersProps,
 	TaskPriority,
@@ -30,18 +30,40 @@ export function TaskFilters({
 	onPriorityChange,
 	onClearFilters,
 }: TaskFiltersProps) {
+	const theme = useTheme();
+	const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 	const hasActiveFilters = status !== "all" || priority !== "all";
 
 	return (
-		<Stack direction="row" spacing={1} alignItems="center">
-			<FilterListIcon sx={{ color: "action.active", fontSize: 20 }} />
+		<Stack 
+			direction={isMobile ? "column" : "row"} 
+			spacing={isMobile ? 1 : 2} 
+			alignItems={isMobile ? "stretch" : "center"}
+			sx={{ width: '100%' }}
+		>
+			{/* Иконка фильтра — только на десктопе */}
+			{!isMobile && (
+				<FilterListIcon sx={{ color: "action.active", fontSize: 20, mt: 0.75 }} />
+			)}
 
-			<FormControl size="small" sx={{ minWidth: 110 }}>
+			{/* Селект статуса — всегда fullWidth на мобилках */}
+			<FormControl size="small" fullWidth>
 				<Select
 					value={status}
-					onChange={(e) => onStatusChange(e.target.value)}
+					onChange={(e) => onStatusChange(e.target.value as TaskStatusFilter)}
 					size="small"
 					variant="outlined"
+					fullWidth
+					displayEmpty
+					sx={{
+						'& .MuiSelect-select': {
+							fontSize: isMobile ? '0.8rem' : '0.875rem',
+							padding: isMobile ? '6px 8px' : '8px 12px',
+						},
+						'& .MuiSvgIcon-root': {
+							fontSize: isMobile ? '1rem' : '1.2rem',
+						},
+					}}
 				>
 					{STATUS_OPTIONS.map((option) => (
 						<MenuItem key={option.value} value={option.value}>
@@ -51,12 +73,24 @@ export function TaskFilters({
 				</Select>
 			</FormControl>
 
-			<FormControl size="small" sx={{ minWidth: 110 }}>
+			{/* Селект приоритета — всегда fullWidth на мобилках */}
+			<FormControl size="small" fullWidth>
 				<Select
 					value={priority}
-					onChange={(e) => onPriorityChange(e.target.value)}
+					onChange={(e) => onPriorityChange(e.target.value as TaskPriorityFilter)}
 					size="small"
 					variant="outlined"
+					fullWidth
+					displayEmpty
+					sx={{
+						'& .MuiSelect-select': {
+							fontSize: isMobile ? '0.8rem' : '0.875rem',
+							padding: isMobile ? '6px 8px' : '8px 12px',
+						},
+						'& .MuiSvgIcon-root': {
+							fontSize: isMobile ? '1rem' : '1.2rem',
+						},
+					}}
 				>
 					{PRIORITY_OPTIONS.map((option) => (
 						<MenuItem key={option.value} value={option.value}>
@@ -66,15 +100,30 @@ export function TaskFilters({
 				</Select>
 			</FormControl>
 
+			{/* Кнопка "Clear" — компактная и только если есть активные фильтры */}
 			{hasActiveFilters && (
 				<Button
 					size="small"
 					variant="outlined"
 					onClick={onClearFilters}
 					startIcon={<ClearIcon />}
-					sx={{ height: 32 }}
+					sx={{ 
+						height: 32,
+						whiteSpace: 'nowrap',
+						mt: isMobile ? 0 : 0,
+						// На мобилках — компактнее
+						...isMobile && {
+							minWidth: 'auto',
+							px: 0.5,
+							py: 0.5,
+							'& .MuiButton-startIcon': {
+								marginRight: 0.25,
+							},
+						}
+					}}
+					fullWidth={isMobile}
 				>
-					Clear
+					{isMobile ? "×" : "Clear filters"}
 				</Button>
 			)}
 		</Stack>

@@ -1,6 +1,6 @@
 import { useTaskForm } from "@hooks/useTaskForm";
 import { useUsers } from "@hooks/useUsers";
-import { Alert, Box, Button, CircularProgress, Typography } from "@mui/material";
+import { Alert, Box, Button, CircularProgress, Typography, useTheme, useMediaQuery } from "@mui/material";
 import { FormMultiSelect } from "@/components/forms/FormMultiSelect";
 import { FormSelect } from "@/components/forms/FormSelect";
 import { FormTextField } from "@/components/forms/FormTextField";
@@ -38,6 +38,8 @@ export default function TaskForm({
 }: ExtendedTaskFormProps) {
   const { form, errors, updateField, validateForm, resetForm } = useTaskForm(initialData);
   const { users, isLoading: usersLoading } = useUsers();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const handleChange = (field: keyof TaskFormValues, value: any): void => {
     updateField(field, value);
@@ -45,12 +47,9 @@ export default function TaskForm({
 
   const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
-
     const isValid = validateForm();
-
-    if (!isValid) {
-      return;
-    }
+    
+    if (!isValid) { return; }
 
     try {
       await onSubmit(form);
@@ -61,16 +60,19 @@ export default function TaskForm({
   };
 
   const handleCancel = (): void => {
-    if (onClose) {
-      onClose();
-    }
+    if (onClose) { onClose(); }
   };
 
   return (
     <Box
       component="form"
       onSubmit={handleSubmit}
-      sx={{ display: "flex", flexDirection: "column", gap: 3, pt: 1 }}
+      sx={{ 
+        display: "flex", 
+        flexDirection: "column", 
+        gap: isMobile ? 2 : 3, 
+        pt: isMobile ? 0.5 : 1 
+      }}
     >
       <FormTextField
         field="title"
@@ -81,6 +83,7 @@ export default function TaskForm({
         helperText="Enter task title"
         required
         disabled={isSubmitting}
+        fullWidth
       />
 
       <FormTextField
@@ -90,11 +93,16 @@ export default function TaskForm({
         label={TaskFormStrings.DESCRIPTION_LABEL}
         error={errors.description}
         multiline
-        rows={3}
+        rows={isMobile ? 4 : 3}
         disabled={isSubmitting}
+        fullWidth
       />
 
-      <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+      <Box sx={{ 
+        display: "flex", 
+        gap: 2, 
+        flexDirection: "column" 
+      }}>
         <FormSelect
           field="status"
           value={form.status || ""}
@@ -126,6 +134,7 @@ export default function TaskForm({
         error={errors.deadline}
         helperText="Set deadline for task (optional)"
         disabled={isSubmitting}
+        fullWidth
       />
 
       <FormMultiSelect
@@ -142,7 +151,7 @@ export default function TaskForm({
       />
 
       {!usersLoading && users.filter((u) => u.id !== currentUserId).length > 0 && (
-        <Alert severity="info" sx={{ mt: 1 }}>
+        <Alert severity="info" sx={{ mt: 1, fontSize: isMobile ? "0.85rem" : "0.875rem" }}>
           <Typography variant="body2">
             Available users for assignment: {users.filter((u) => u.id !== currentUserId).length}
           </Typography>
@@ -153,16 +162,23 @@ export default function TaskForm({
         <Box
           sx={{
             display: "flex",
+            flexDirection: isMobile ? "column" : "row",
             justifyContent: "flex-end",
-            gap: 2,
-            mt: 3,
-            pt: 2,
+            gap: isMobile ? 1 : 2,
+            mt: isMobile ? 2 : 3,
+            pt: isMobile ? 1 : 2,
             borderTop: 1,
             borderColor: "divider",
           }}
         >
           {onClose && (
-            <Button type="button" onClick={handleCancel} variant="outlined" disabled={isSubmitting}>
+            <Button 
+              type="button" 
+              onClick={handleCancel} 
+              variant="outlined" 
+              disabled={isSubmitting}
+              fullWidth={isMobile}
+            >
               Cancel
             </Button>
           )}
@@ -170,6 +186,7 @@ export default function TaskForm({
             type="submit"
             variant="contained"
             disabled={isSubmitting}
+            fullWidth={isMobile}
             startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
           >
             {isSubmitting ? "Submitting..." : "Submit"}

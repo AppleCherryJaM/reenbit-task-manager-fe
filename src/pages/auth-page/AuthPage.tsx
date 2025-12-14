@@ -1,4 +1,4 @@
-import { Alert, Container, Paper } from "@mui/material";
+import { Alert, Box, Container, Paper } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthForm from "@/components/auth/AuthForm";
@@ -39,16 +39,40 @@ export default function AuthPage() {
 	};
 
 	return (
-		<Container maxWidth="sm" sx={{ mt: 8 }}>
-			<Paper elevation={3} sx={{ borderRadius: 2, overflow: "hidden", p: 3 }}>
-				{error && (
-					<Alert severity="error" sx={{ mb: 2 }}>
-						{error}
-					</Alert>
-				)}
+		<Box
+			sx={{
+				display: 'flex',
+				justifyContent: 'center',
+				alignItems: 'center',
+				minHeight: '100vh',
+				backgroundColor: 'background.default', 
+				p: 2,
+			}}
+		>
+			<Container 
+				maxWidth="sm" 
+				sx={{ 
+					mt: { xs: 4, sm: 8 },
+					mb: { xs: 4, sm: 8 },
+				}} 
+			>
+				<Paper 
+					elevation={3} 
+					sx={{ 
+						borderRadius: 2, 
+						overflow: "hidden", 
+						p: { xs: 2, sm: 3 } 
+					}} 
+				>
+					{error && (
+						<Alert severity="error" sx={{ mb: 2 }}>
+							{error}
+						</Alert>
+					)}
 
-				<AuthForm mode={mode} onSubmit={handleSubmit} loading={loading} onModeChange={setMode} />
-			</Paper>
-		</Container>
+					<AuthForm mode={mode} onSubmit={handleSubmit} loading={loading} onModeChange={setMode} />
+				</Paper>
+			</Container>
+		</Box>
 	);
 }

@@ -161,7 +161,11 @@ export default function AuthForm({ mode, onSubmit, loading, onModeChange }: Auth
 				fullWidth
 				variant="contained"
 				size="large"
-				sx={{ mt: 3, mb: 2 }}
+				sx={{ 
+					mt: { xs: 2.5, sm: 3 }, 
+					mb: { xs: 1.5, sm: 2 },
+					py: { xs: 1.2, sm: 1.5 }
+				}}
 				disabled={loading}
 			>
 				{loading ? (
@@ -173,7 +177,13 @@ export default function AuthForm({ mode, onSubmit, loading, onModeChange }: Auth
 				)}
 			</Button>
 
-			<Box sx={{ textAlign: "center" }}>
+			<Box sx={{ 
+				textAlign: "center",
+				mt: 2,
+				'& .MuiTypography-body2': {
+					lineHeight: 1.5,
+  			} 
+			}}>
 				<Typography variant="body2" color="text.secondary">
 					{isLogin ? AuthFormStrings.SWITCH_TO_REGISTER : AuthFormStrings.SWITCH_TO_LOGIN}{" "}
 					<Link
