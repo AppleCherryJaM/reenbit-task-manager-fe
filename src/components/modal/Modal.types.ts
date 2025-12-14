@@ -19,6 +19,8 @@ export interface ModalBaseProps {
 	disableSecondary?: boolean;
 	showActions?: boolean;
 	isLoading?: boolean;
+  primaryBtnColor?: string;
+  secondaryBtnColor?: string;
 
 	maxWidth?: "xs" | "sm" | "md" | "lg" | "xl";
 	fullWidth?: boolean;

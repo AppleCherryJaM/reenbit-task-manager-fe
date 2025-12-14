@@ -1,4 +1,5 @@
 import {
+  Box,
 	Button,
 	Dialog,
 	DialogActions,
@@ -26,6 +27,8 @@ export default function ModalBase({
 	showActions = true,
 	isLoading = false,
 
+  primaryBtnColor = "primary",  
+  secondaryBtnColor = "inherit",
 	maxWidth = "sm",
 	fullWidth = true,
 	dividers = false,
@@ -65,36 +68,48 @@ export default function ModalBase({
 				{children}
 			</DialogContent>
 			{showActions && (
-				<DialogActions
-					sx={{
-						px: { xs: 2, sm: 3 },
-						pb: { xs: 2, sm: 2.5 },
-						flexDirection: { xs: "column", sm: "row" },
-						gap: { xs: 1, sm: 0 },
-					}}
-				>
-					{secondaryBtnText && (
-						<Button
-							onClick={handleSecondary}
-							color="inherit"
-							disabled={disableSecondary || isLoading}
-							fullWidth={isMobile}
-						>
-							{secondaryBtnText}
-						</Button>
-					)}
-					{primaryBtnText && handlePrimaryAction && (
+				<Box
+          sx={{
+            px: { xs: 2, sm: 3 },
+            pb: { xs: 2, sm: 2.5 },
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            gap: { xs: 1, sm: 1 },
+            justifyContent: { xs: 'center', sm: 'flex-end' },
+            width: '100%',
+          }}
+        >
+          {primaryBtnText && handlePrimaryAction && (
 						<Button
 							onClick={handlePrimaryAction}
 							variant="contained"
+              color={primaryBtnColor}
 							disabled={isPrimaryDisabled || isLoading}
-							fullWidth={isMobile}
-							startIcon={isLoading ? null : undefined}
+							fullWidth
+              sx={{ 
+                maxWidth: { sm: 'auto' },
+                width: { xs: '100%', sm: 'auto' },
+              }}
 						>
 							{isLoading ? "Processing..." : primaryBtnText}
 						</Button>
 					)}
-				</DialogActions>
+					{secondaryBtnText && (
+						<Button
+							onClick={handleSecondary}
+							color={secondaryBtnColor}
+              variant="outlined"
+							disabled={disableSecondary || isLoading}
+							fullWidth
+              sx={{ 
+                maxWidth: { sm: 'auto' },
+                width: { xs: '100%', sm: 'auto' },
+              }}
+						>
+							{secondaryBtnText}
+						</Button>
+					)}
+				</Box>
 			)}
 		</Dialog>
 	);
