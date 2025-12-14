@@ -1,13 +1,13 @@
-import { useState } from 'react';
+import { useState } from "react";
 
 export const useTaskFilters = () => {
-  const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
+	const [page, setPage] = useState(0);
+	const [pageSize, setPageSize] = useState(10);
 
-  return {
-    page,
-    pageSize,
-    setPage,
-    setPageSize,
-  };
+	return {
+		page,
+		pageSize,
+		setPage,
+		setPageSize,
+	};
 };

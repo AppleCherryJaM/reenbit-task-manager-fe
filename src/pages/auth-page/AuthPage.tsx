@@ -41,28 +41,28 @@ export default function AuthPage() {
 	return (
 		<Box
 			sx={{
-				display: 'flex',
-				justifyContent: 'center',
-				alignItems: 'center',
-				minHeight: '100vh',
-				backgroundColor: 'background.default', 
+				display: "flex",
+				justifyContent: "center",
+				alignItems: "center",
+				minHeight: "100vh",
+				backgroundColor: "background.default",
 				p: 2,
 			}}
 		>
-			<Container 
-				maxWidth="sm" 
-				sx={{ 
+			<Container
+				maxWidth="sm"
+				sx={{
 					mt: { xs: 4, sm: 8 },
 					mb: { xs: 4, sm: 8 },
-				}} 
+				}}
 			>
-				<Paper 
-					elevation={3} 
-					sx={{ 
-						borderRadius: 2, 
-						overflow: "hidden", 
-						p: { xs: 2, sm: 3 } 
-					}} 
+				<Paper
+					elevation={3}
+					sx={{
+						borderRadius: 2,
+						overflow: "hidden",
+						p: { xs: 2, sm: 3 },
+					}}
 				>
 					{error && (
 						<Alert severity="error" sx={{ mb: 2 }}>

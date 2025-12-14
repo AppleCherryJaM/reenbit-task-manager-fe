@@ -1,69 +1,74 @@
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogTitle, 
-  DialogActions, 
-  Button, 
-  useTheme, 
-  useMediaQuery, 
-  Box
+import {
+  Box,
+	Button,
+	Dialog,
+	DialogActions,
+	DialogContent,
+	DialogTitle,
+	useMediaQuery,
+	useTheme,
 } from "@mui/material";
 import type { ModalBaseProps } from "./Modal.types";
 
-export default function ModalBase({ 
-  open, 
-  title, 
-  children, 
-  onClose,
-  primaryBtnText,
-  secondaryBtnText = "Cancel",
-  onSubmit, 
-  onPrimaryAction, 
-  onSecondaryAction,
-  disableSubmit,
-  disablePrimary, 
-  disableSecondary,
-  showActions = true,
-  isLoading = false,
+export default function ModalBase({
+	open,
+	title,
+	children,
+	onClose,
+
+	primaryBtnText,
+	secondaryBtnText = "Cancel",
+	onSubmit,
+	onPrimaryAction,
+	onSecondaryAction,
+	disableSubmit,
+	disablePrimary,
+	disableSecondary,
+	showActions = true,
+	isLoading = false,
+
   primaryBtnColor = "primary",  
   secondaryBtnColor = "inherit",
-  maxWidth = 'sm',
-  fullWidth = true,
-  dividers = false
+	maxWidth = "sm",
+	fullWidth = true,
+	dividers = false,
 }: ModalBaseProps) {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+	const theme = useTheme();
+	const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const handlePrimaryAction = onPrimaryAction || onSubmit;
-  const isPrimaryDisabled = disablePrimary !== undefined 
-    ? disablePrimary 
-    : (disableSubmit !== undefined ? disableSubmit : false);
-  
-  const handleSecondary = onSecondaryAction || onClose;
-  
-  return (
-    <Dialog 
-      open={open} 
-      onClose={onClose} 
-      fullWidth={fullWidth} 
-      maxWidth={!isMobile ? maxWidth : false}
-    >
-      <DialogTitle sx={{ px: { xs: 2, sm: 3 } }}>{title}</DialogTitle>
-      <DialogContent 
-        dividers={dividers}
-        sx={{ 
-          display: "flex", 
-          flexDirection: "column", 
-          gap: 2, 
-          mt: 1,
-          px: { xs: 2, sm: 3 },
-          pb: { xs: 2, sm: 3 }
-        }}
-      >
-        {children}
-      </DialogContent>
-      {showActions && (
-        <Box
+	const handlePrimaryAction = onPrimaryAction || onSubmit;
+	const isPrimaryDisabled =
+		disablePrimary !== undefined
+			? disablePrimary
+			: disableSubmit !== undefined
+				? disableSubmit
+				: false;
+
+	const handleSecondary = onSecondaryAction || onClose;
+
+	return (
+		<Dialog
+			open={open}
+			onClose={onClose}
+			fullWidth={fullWidth}
+			maxWidth={!isMobile ? maxWidth : false}
+		>
+			<DialogTitle sx={{ px: { xs: 2, sm: 3 } }}>{title}</DialogTitle>
+			<DialogContent
+				dividers={dividers}
+				sx={{
+					display: "flex",
+					flexDirection: "column",
+					gap: 2,
+					mt: 1,
+					px: { xs: 2, sm: 3 },
+					pb: { xs: 2, sm: 3 },
+				}}
+			>
+				{children}
+			</DialogContent>
+			{showActions && (
+				<Box
           sx={{
             px: { xs: 2, sm: 3 },
             pb: { xs: 2, sm: 2.5 },
@@ -74,38 +79,38 @@ export default function ModalBase({
             width: '100%',
           }}
         >
-          {secondaryBtnText && (
-            <Button 
-              onClick={handleSecondary} 
-              color={secondaryBtnColor}
-              variant="outlined"
-              disabled={disableSecondary || isLoading}
-              fullWidth
-              sx={{ 
-                maxWidth: { sm: 'auto' },
-                width: { xs: '100%', sm: 'auto' },
-              }}
-            >
-              {secondaryBtnText}
-            </Button>
-          )}
           {primaryBtnText && handlePrimaryAction && (
-            <Button 
-              onClick={handlePrimaryAction} 
-              variant="contained" 
+						<Button
+							onClick={handlePrimaryAction}
+							variant="contained"
               color={primaryBtnColor}
-              disabled={isPrimaryDisabled || isLoading}
-              fullWidth
+							disabled={isPrimaryDisabled || isLoading}
+							fullWidth
               sx={{ 
                 maxWidth: { sm: 'auto' },
                 width: { xs: '100%', sm: 'auto' },
               }}
-            >
-              {isLoading ? "Processing..." : primaryBtnText}
-            </Button>
-          )}
-        </Box>
-      )}
-    </Dialog>
-  );
+						>
+							{isLoading ? "Processing..." : primaryBtnText}
+						</Button>
+					)}
+					{secondaryBtnText && (
+						<Button
+							onClick={handleSecondary}
+							color={secondaryBtnColor}
+              variant="outlined"
+							disabled={disableSecondary || isLoading}
+							fullWidth
+              sx={{ 
+                maxWidth: { sm: 'auto' },
+                width: { xs: '100%', sm: 'auto' },
+              }}
+						>
+							{secondaryBtnText}
+						</Button>
+					)}
+				</Box>
+			)}
+		</Dialog>
+	);
 }

@@ -47,7 +47,6 @@ export enum TaskFormStrings {
 
 export enum CSVFormStrings {
 	CSV_FORMAT = "CSV format: title, description, status, priority, deadline, authorId, assigneeIds",
-
 }
 
 export enum StatusOptions {
@@ -61,4 +60,3 @@ export enum PriorityOptions {
 	MEDIUM = "Medium",
 	HIGH = "High",
 }
-

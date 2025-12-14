@@ -3,10 +3,10 @@ import { ThemeProvider } from "@mui/material/styles";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { BrowserRouter as Router } from "react-router-dom";
+import { ConfirmationProvider } from "./providers/ConfirmationProvider";
+import { ToastProvider } from "./providers/ToastProvider";
 import { theme } from "./providers/theme.provider";
 import MainRouter from "./router/MainRouter";
-import { ToastProvider } from "./providers/ToastProvider";
-import { ConfirmationProvider } from "./providers/ConfirmationProvider";
 
 const queryClient = new QueryClient({
 	defaultOptions: {

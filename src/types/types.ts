@@ -13,13 +13,13 @@ export interface User {
 }
 
 export interface TaskCreateData {
-  title: string;
-  description?: string;
-  status?: TaskStatus;
-  priority?: TaskPriority;
-  deadline?: string | null;
-  authorId: string;
-  assigneeIds?: string[];
+	title: string;
+	description?: string;
+	status?: TaskStatus;
+	priority?: TaskPriority;
+	deadline?: string | null;
+	authorId: string;
+	assigneeIds?: string[];
 }
 
 export interface Task {

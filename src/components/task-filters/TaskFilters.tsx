@@ -1,6 +1,15 @@
 import ClearIcon from "@mui/icons-material/Clear";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import { Box, Button, FormControl, MenuItem, Select, Stack, useTheme, useMediaQuery } from "@mui/material";
+import {
+	Box,
+	Button,
+	FormControl,
+	MenuItem,
+	Select,
+	Stack,
+	useMediaQuery,
+	useTheme,
+} from "@mui/material";
 import {
 	type TaskFiltersProps,
 	TaskPriority,
@@ -31,19 +40,17 @@ export function TaskFilters({
 	onClearFilters,
 }: TaskFiltersProps) {
 	const theme = useTheme();
-	const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+	const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 	const hasActiveFilters = status !== "all" || priority !== "all";
 
 	return (
-		<Stack 
-			direction={isMobile ? "column" : "row"} 
-			spacing={isMobile ? 1 : 2} 
+		<Stack
+			direction={isMobile ? "column" : "row"}
+			spacing={isMobile ? 1 : 2}
 			alignItems={isMobile ? "stretch" : "center"}
-			sx={{ width: '100%' }}
+			sx={{ width: "100%" }}
 		>
-			{!isMobile && (
-				<FilterListIcon sx={{ color: "action.active", fontSize: 20, mt: 0.75 }} />
-			)}
+			{!isMobile && <FilterListIcon sx={{ color: "action.active", fontSize: 20, mt: 0.75 }} />}
 
 			<FormControl size="small" fullWidth>
 				<Select
@@ -54,12 +61,12 @@ export function TaskFilters({
 					fullWidth
 					displayEmpty
 					sx={{
-						'& .MuiSelect-select': {
-							fontSize: isMobile ? '0.8rem' : '0.875rem',
-							padding: isMobile ? '6px 8px' : '8px 12px',
+						"& .MuiSelect-select": {
+							fontSize: isMobile ? "0.8rem" : "0.875rem",
+							padding: isMobile ? "6px 8px" : "8px 12px",
 						},
-						'& .MuiSvgIcon-root': {
-							fontSize: isMobile ? '1rem' : '1.2rem',
+						"& .MuiSvgIcon-root": {
+							fontSize: isMobile ? "1rem" : "1.2rem",
 						},
 					}}
 				>
@@ -80,12 +87,12 @@ export function TaskFilters({
 					fullWidth
 					displayEmpty
 					sx={{
-						'& .MuiSelect-select': {
-							fontSize: isMobile ? '0.8rem' : '0.875rem',
-							padding: isMobile ? '6px 8px' : '8px 12px',
+						"& .MuiSelect-select": {
+							fontSize: isMobile ? "0.8rem" : "0.875rem",
+							padding: isMobile ? "6px 8px" : "8px 12px",
 						},
-						'& .MuiSvgIcon-root': {
-							fontSize: isMobile ? '1rem' : '1.2rem',
+						"& .MuiSvgIcon-root": {
+							fontSize: isMobile ? "1rem" : "1.2rem",
 						},
 					}}
 				>
@@ -103,18 +110,18 @@ export function TaskFilters({
 					variant="outlined"
 					onClick={onClearFilters}
 					startIcon={<ClearIcon />}
-					sx={{ 
+					sx={{
 						height: 32,
-						whiteSpace: 'nowrap',
+						whiteSpace: "nowrap",
 						mt: isMobile ? 0 : 0,
-						...isMobile && {
-							minWidth: 'auto',
+						...(isMobile && {
+							minWidth: "auto",
 							px: 0.5,
 							py: 0.5,
-							'& .MuiButton-startIcon': {
+							"& .MuiButton-startIcon": {
 								marginRight: 0.25,
 							},
-						}
+						}),
 					}}
 					fullWidth={isMobile}
 				>

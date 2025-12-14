@@ -1,10 +1,10 @@
 import TaskForm from "@components/task-form/TaskForm";
-import { useState, useRef } from "react";
+import { useRef, useState } from "react";
+import { useToast } from "@/providers/ToastProvider";
 import type { TaskFormValues } from "@/schemas/task.schema";
 import { useModalStore } from "@/store/modal.store";
 import { transformTaskToFormValues } from "@/utils/task-transform.utils";
 import ModalBase from "./ModalBase";
-import { useToast } from "@/providers/ToastProvider";
 
 interface EditTaskModalProps {
 	onUpdateTask: (taskData: any) => Promise<void>;
@@ -17,7 +17,6 @@ export default function EditTaskModal({ onUpdateTask, currentUserId }: EditTaskM
 	const { showToast } = useToast();
 
 	const handleSubmit = async (formData: TaskFormValues) => {
-
 		if (!editingTask) {
 			return;
 		}
@@ -33,14 +32,13 @@ export default function EditTaskModal({ onUpdateTask, currentUserId }: EditTaskM
 			showToast("Task updated successfully", "success");
 		} catch (error) {
 			const message = error instanceof Error ? error.message : "Failed to update task";
-      showToast(message, "error");
+			showToast(message, "error");
 		} finally {
 			setIsSubmitting(false);
 		}
 	};
 
 	const getInitialData = (): TaskFormValues => {
-		
 		if (editingTask) {
 			return transformTaskToFormValues(editingTask);
 		}
@@ -62,7 +60,7 @@ export default function EditTaskModal({ onUpdateTask, currentUserId }: EditTaskM
 	return (
 		<ModalBase
 			open={isEditTaskModalOpen}
-			onClose={(closeEditTaskModal)}
+			onClose={closeEditTaskModal}
 			showActions={false}
 			title="Update Task"
 		>

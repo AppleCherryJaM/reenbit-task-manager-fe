@@ -1,4 +1,4 @@
-import type { TaskStatus, Task } from "@/types/types";
+import type { Task, TaskStatus } from "@/types/types";
 
 export interface CreateTaskData {
 	title: string;
@@ -23,7 +23,7 @@ export interface TaskFilters {
 	fromDate?: string;
 	toDate?: string;
 	sortBy?: string;
-  sortDirection?: 'asc' | 'desc'; 
+	sortDirection?: "asc" | "desc";
 }
 
 export interface TasksResponse {
@@ -39,16 +39,16 @@ export interface TasksResponse {
 }
 
 export interface BulkCreateTaskData {
-  tasks: CreateTaskData[];
+	tasks: CreateTaskData[];
 }
 
 export interface BulkTaskResult {
-  success: Task[];
-  errors: Array<{
-    task: CreateTaskData;
-    error: string;
-  }>;
-  total: number;
-  created: number;
-  failed: number;
+	success: Task[];
+	errors: Array<{
+		task: CreateTaskData;
+		error: string;
+	}>;
+	total: number;
+	created: number;
+	failed: number;
 }
