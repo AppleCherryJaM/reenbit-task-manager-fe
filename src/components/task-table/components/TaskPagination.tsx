@@ -1,4 +1,4 @@
-import { Stack, Typography, Pagination, Select, MenuItem, FormControl } from "@mui/material";
+import { Stack, Typography, Pagination, Select, MenuItem, FormControl, useTheme, useMediaQuery } from "@mui/material";
 import type { TaskPaginationProps } from "@components/task-table/TaskTable.types";
 
 export function TaskPagination({
@@ -9,6 +9,9 @@ export function TaskPagination({
   onPageChange,
   onPageSizeChange,
 }: TaskPaginationProps) {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {
     onPageChange?.(page - 1);
   };
@@ -23,55 +26,75 @@ export function TaskPagination({
 
   return (
     <Stack 
-      direction="row" 
-      justifyContent="space-between" 
-      alignItems="center" 
+      direction={isMobile ? "column" : "row"} 
+      justifyContent={isMobile ? "flex-start" : "space-between"} 
+      alignItems={isMobile ? "stretch" : "center"} 
+      spacing={isMobile ? 1.5 : 0}
       sx={{ 
         mt: 'auto', 
-        pt: 2, 
+        pt: isMobile ? 1.5 : 2, 
         borderTop: 1, 
         borderColor: 'divider' 
       }}
     >
-      {/* Левая часть */}
-      <Stack direction="row" spacing={2} alignItems="center">
+      <Stack 
+        direction={isMobile ? "column" : "row"} 
+        spacing={isMobile ? 0.5 : 2} 
+        alignItems={isMobile ? "flex-start" : "center"}
+      >
         <Typography variant="body2" color="text.secondary">
-          Showing {startItem} to {endItem} of {totalCount}
+          {isMobile ? `Showing ${startItem}–${endItem} of ${totalCount}` : `Showing ${startItem} to ${endItem} of ${totalCount}`}
         </Typography>
         
-        <FormControl size="small" sx={{ minWidth: 80 }}>
-          <Select
-            value={pageSize}
-            onChange={handlePageSizeChange}
-            size="small"
-          >
-            <MenuItem value={5}>5</MenuItem>
-            <MenuItem value={10}>10</MenuItem>
-            <MenuItem value={20}>20</MenuItem>
-            <MenuItem value={50}>50</MenuItem>
-          </Select>
-        </FormControl>
-        
-        <Typography variant="body2" color="text.secondary">
-          per page
-        </Typography>
+        <Stack direction="row" alignItems="center" spacing={1}>
+          <FormControl size="small" sx={{ minWidth: isMobile ? 60 : 80 }}>
+            <Select
+              value={pageSize}
+              onChange={handlePageSizeChange}
+              size="small"
+              sx={{
+                '& .MuiSelect-select': {
+                  fontSize: isMobile ? '0.8rem' : '0.875rem',
+                  py: isMobile ? 0.5 : undefined,
+                }
+              }}
+            >
+              <MenuItem value={5}>5</MenuItem>
+              <MenuItem value={10}>10</MenuItem>
+              <MenuItem value={20}>20</MenuItem>
+              <MenuItem value={50}>50</MenuItem>
+            </Select>
+          </FormControl>
+          
+          {!isMobile && (
+            <Typography variant="body2" color="text.secondary">
+              per page
+            </Typography>
+          )}
+        </Stack>
       </Stack>
 
-      {/* Центральная часть */}
       <Pagination
         count={totalPages}
         page={currentPage + 1}
         onChange={handlePageChange}
         color="primary"
-        size="medium"
-        showFirstButton
-        showLastButton
+        size={isMobile ? "small" : "medium"}
+        showFirstButton={!isMobile}
+        showLastButton={!isMobile}
+        sx={{ 
+          alignSelf: isMobile ? 'center' : 'auto',
+          '& .MuiPaginationItem-root': {
+            fontSize: isMobile ? '0.75rem' : '0.875rem',
+          }
+        }}
       />
 
-      {/* Правая часть */}
-      <Typography variant="body2" color="text.secondary">
-        Page {currentPage + 1} of {totalPages || 1}
-      </Typography>
+      {!isMobile && (
+        <Typography variant="body2" color="text.secondary">
+          Page {currentPage + 1} of {totalPages || 1}
+        </Typography>
+      )}
     </Stack>
   );
 }

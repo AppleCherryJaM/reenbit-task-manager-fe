@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogTitle, DialogActions, Button } from "@mui/material";
+import { Dialog, DialogContent, DialogTitle, DialogActions, Button, useTheme, useMediaQuery } from "@mui/material";
 import type { ModalBaseProps } from "./Modal.types";
 
 export default function ModalBase({ 
@@ -23,6 +23,9 @@ export default function ModalBase({
   dividers = false
 }: ModalBaseProps) {
 
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   const handlePrimaryAction = onPrimaryAction || onSubmit;
   const isPrimaryDisabled = disablePrimary !== undefined 
     ? disablePrimary 
@@ -35,27 +38,35 @@ export default function ModalBase({
       open={open} 
       onClose={onClose} 
       fullWidth={fullWidth} 
-      maxWidth={maxWidth}
+      maxWidth={!isMobile ? maxWidth : false}
     >
-      <DialogTitle>{title}</DialogTitle>
+      <DialogTitle sx={{ px: { xs: 2, sm: 3 } }}>{title}</DialogTitle>
       <DialogContent 
         dividers={dividers}
         sx={{ 
           display: "flex", 
           flexDirection: "column", 
           gap: 2, 
-          mt: 1 
+          mt: 1,
+          px: { xs: 2, sm: 3 },
+          pb: { xs: 2, sm: 3 }
         }}
       >
         {children}
       </DialogContent>
       {showActions && (
-        <DialogActions sx={{ px: 3, pb: 2 }}>
+        <DialogActions sx={{ 
+          px: { xs: 2, sm: 3 }, 
+          pb: { xs: 2, sm: 2.5 },
+          flexDirection: { xs: 'column', sm: 'row' },
+          gap: { xs: 1, sm: 0 }
+        }}>
           {secondaryBtnText && (
             <Button 
               onClick={handleSecondary} 
               color="inherit" 
               disabled={disableSecondary || isLoading}
+              fullWidth={isMobile}
             >
               {secondaryBtnText}
             </Button>
@@ -65,6 +76,7 @@ export default function ModalBase({
               onClick={handlePrimaryAction} 
               variant="contained" 
               disabled={isPrimaryDisabled || isLoading}
+              fullWidth={isMobile}
               startIcon={isLoading ? null : undefined}
             >
               {isLoading ? "Processing..." : primaryBtnText}

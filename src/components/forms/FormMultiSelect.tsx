@@ -11,11 +11,15 @@ import {
 	OutlinedInput,
 	Select,
 	Typography,
+	useTheme,
+	useMediaQuery,
 } from "@mui/material";
 import type { SelectChangeEvent } from "@mui/material/Select";
 import type { FormMultiSelectProps } from "./forms.types";
 
-const maxHeight = 48 * 4.5 + 8;
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MENU_HEIGHT = ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP;
 
 export const FormMultiSelect = <K extends string>({
 	field,
@@ -29,6 +33,9 @@ export const FormMultiSelect = <K extends string>({
 	helperText,
 	disabled,
 }: FormMultiSelectProps<K>) => {
+	const theme = useTheme();
+	const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
 	const handleChange = (event: SelectChangeEvent<string[]>): void => {
 		const {
 			target: { value: selectedValue },
@@ -45,13 +52,12 @@ export const FormMultiSelect = <K extends string>({
 	const availableUsers = users.filter((user) => user.id !== currentUserId);
 
 	const renderContent = () => {
-		
 		if (isLoading) {
 			return (
 				<MenuItem disabled>
 					<Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
 						<CircularProgress size={20} />
-						<Typography>Loading users...</Typography>
+						<Typography variant="body2">Loading users...</Typography>
 					</Box>
 				</MenuItem>
 			);
@@ -68,9 +74,25 @@ export const FormMultiSelect = <K extends string>({
 		}
 
 		return availableUsers.map((user) => (
-			<MenuItem key={user.id} value={user.id}>
-				<Checkbox checked={value.includes(user.id)} disabled={disabled} />
-				<ListItemText primary={user.name || user.email} secondary={user.name ? user.email : ""} />
+			<MenuItem 
+				key={user.id} 
+				value={user.id}
+				sx={{ 
+					minHeight: ITEM_HEIGHT,
+					px: isMobile ? 1.5 : 2,
+				}}
+			>
+				<Checkbox 
+					checked={value.includes(user.id)} 
+					disabled={disabled} 
+					sx={{ p: 0.5 }} 
+				/>
+				<ListItemText 
+					primary={user.name || user.email} 
+					secondary={user.name ? user.email : ""} 
+					primaryTypographyProps={{ variant: "body2" }}
+					secondaryTypographyProps={{ variant: "caption" }}
+				/>
 			</MenuItem>
 		));
 	};
@@ -84,7 +106,12 @@ export const FormMultiSelect = <K extends string>({
 				onChange={handleChange}
 				input={<OutlinedInput label={label} />}
 				renderValue={(selected) => (
-					<Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+					<Box sx={{ 
+						display: "flex", 
+						flexWrap: "wrap", 
+						gap: 0.5,
+						minHeight: '2.5rem',
+					}}>
 						{selected.map((userId) => {
 							const user = users.find((u) => u.id === userId);
 							return (
@@ -94,6 +121,9 @@ export const FormMultiSelect = <K extends string>({
 									size="small"
 									onDelete={disabled ? undefined : () => handleDeleteChip(userId)}
 									onMouseDown={(e) => e.stopPropagation()}
+									sx={{ 
+										maxWidth: '100%',
+									}}
 								/>
 							);
 						})}
@@ -102,9 +132,22 @@ export const FormMultiSelect = <K extends string>({
 				MenuProps={{
 					PaperProps: {
 						style: {
-							maxHeight: maxHeight,
-							width: 250,
+							maxHeight: MENU_HEIGHT,
+							width: isMobile ? '100vw' : 250,
 						},
+						sx: {
+							ml: isMobile ? -2 : 0,
+							mr: isMobile ? -2 : 0,
+							minWidth: isMobile ? 'auto' : 250,
+						},
+					},
+					anchorOrigin: {
+						vertical: "bottom",
+						horizontal: "left",
+					},
+					transformOrigin: {
+						vertical: "top",
+						horizontal: "left",
 					},
 				}}
 				disabled={isLoading || disabled}
@@ -112,7 +155,9 @@ export const FormMultiSelect = <K extends string>({
 			>
 				{renderContent()}
 			</Select>
-			<FormHelperText error={!!error}>{error || helperText || " "}</FormHelperText>
+			<FormHelperText error={!!error}>
+				{error || helperText || " "}
+			</FormHelperText>
 		</FormControl>
 	);
 };

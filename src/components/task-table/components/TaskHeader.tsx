@@ -1,11 +1,24 @@
-import { Button, Stack, Typography } from "@mui/material";
+import { Button, Stack, Typography, useTheme, useMediaQuery } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { TaskTableStrings, type TaskHeaderProps } from "@components/task-table/TaskTable.types";
 
 export function TaskHeader({ totalCount, onAddTask }: TaskHeaderProps) {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   return (
-    <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-      <Typography variant="h5" fontWeight={600}>
+    <Stack 
+      direction={isMobile ? "column" : "row"} 
+      justifyContent={isMobile ? "flex-start" : "space-between"} 
+      alignItems={isMobile ? "stretch" : "center"} 
+      spacing={isMobile ? 1 : 0}
+      mb={isMobile ? 1.5 : 2}
+    >
+      <Typography 
+        variant={isMobile ? "h6" : "h5"} 
+        fontWeight={600}
+        noWrap={isMobile}
+      >
         {TaskTableStrings.TASKS_LABEL} ({totalCount})
       </Typography>
 
@@ -13,7 +26,12 @@ export function TaskHeader({ totalCount, onAddTask }: TaskHeaderProps) {
         startIcon={<AddIcon />}
         onClick={onAddTask}
         variant="contained"
-        sx={{ textTransform: "none" }}
+        sx={{ 
+          textTransform: "none",
+          alignSelf: isMobile ? 'flex-start' : 'auto',
+          minWidth: isMobile ? 'auto' : 120,
+          px: isMobile ? 1 : 1.5,
+        }}
       >
         {TaskTableStrings.ADD_TASK_BUTTON}
       </Button>

@@ -9,7 +9,9 @@ import {
   Alert,
   Typography,
   Switch,
-  FormControlLabel
+  FormControlLabel,
+  useTheme,
+  useMediaQuery
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import AddIcon from "@mui/icons-material/Add";
@@ -30,8 +32,10 @@ export default function CreateTaskModal({
   const [useCSV, setUseCSV] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [csvFileSelected, setCsvFileSelected] = useState(false);
-
   const csvImportRef = useRef<CSVImportViewRef>(null);
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const bulkCreateMutation = useBulkCreateTasks({
     onSuccess: () => {
@@ -66,17 +70,13 @@ export default function CreateTaskModal({
   };
 
   const handleCsvSubmit = async () => {
-
     if (!csvFileSelected) {
       const fileInput = document.getElementById('csv-upload-input') as HTMLInputElement;
-      
       if (fileInput) {
         fileInput.click();
       }
-      
       return;
     }
-
     if (csvImportRef.current) {
       await csvImportRef.current.triggerUpload();
     }
@@ -92,16 +92,11 @@ export default function CreateTaskModal({
       secondaryBtnText="Cancel"
       onPrimaryAction={useCSV ? handleCsvSubmit : () => document.querySelector('form')?.requestSubmit()}
       onSecondaryAction={handleCloseModal}
-      disablePrimary={
-        useCSV 
-          ? bulkCreateMutation.isPending 
-          : isSubmitting
-      }
+      disablePrimary={useCSV ? bulkCreateMutation.isPending : isSubmitting}
       isLoading={isSubmitting || bulkCreateMutation.isPending}
-      maxWidth="sm"
     >
       <Box sx={{ width: "100%" }}>
-        <Box sx={{ mb: 3 }}>
+        <Box sx={{ mb: isMobile ? 2 : 3 }}>
           <FormControlLabel
             control={
               <Switch
@@ -115,12 +110,16 @@ export default function CreateTaskModal({
                 {useCSV ? (
                   <>
                     <CloudUploadIcon fontSize="small" />
-                    <Typography>Bulk Create from CSV</Typography>
+                    <Typography variant="body1">
+                      Bulk Create from CSV
+                    </Typography>
                   </>
                 ) : (
                   <>
                     <AddIcon fontSize="small" />
-                    <Typography>Create Single Task</Typography>
+                    <Typography variant="body1">
+                      Create Single Task
+                    </Typography>
                   </>
                 )}
               </Box>
