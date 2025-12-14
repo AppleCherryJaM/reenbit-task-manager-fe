@@ -1,12 +1,20 @@
-import { Dialog, DialogContent, DialogTitle, DialogActions, Button, useTheme, useMediaQuery } from "@mui/material";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogTitle, 
+  DialogActions, 
+  Button, 
+  useTheme, 
+  useMediaQuery, 
+  Box
+} from "@mui/material";
 import type { ModalBaseProps } from "./Modal.types";
 
 export default function ModalBase({ 
   open, 
   title, 
   children, 
-  onClose, 
-
+  onClose,
   primaryBtnText,
   secondaryBtnText = "Cancel",
   onSubmit, 
@@ -17,12 +25,12 @@ export default function ModalBase({
   disableSecondary,
   showActions = true,
   isLoading = false,
-
+  primaryBtnColor = "primary",  
+  secondaryBtnColor = "inherit",
   maxWidth = 'sm',
   fullWidth = true,
   dividers = false
 }: ModalBaseProps) {
-
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -55,18 +63,28 @@ export default function ModalBase({
         {children}
       </DialogContent>
       {showActions && (
-        <DialogActions sx={{ 
-          px: { xs: 2, sm: 3 }, 
-          pb: { xs: 2, sm: 2.5 },
-          flexDirection: { xs: 'column', sm: 'row' },
-          gap: { xs: 1, sm: 0 }
-        }}>
+        <Box
+          sx={{
+            px: { xs: 2, sm: 3 },
+            pb: { xs: 2, sm: 2.5 },
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            gap: { xs: 1, sm: 1 },
+            justifyContent: { xs: 'center', sm: 'flex-end' },
+            width: '100%',
+          }}
+        >
           {secondaryBtnText && (
             <Button 
               onClick={handleSecondary} 
-              color="inherit" 
+              color={secondaryBtnColor}
+              variant="outlined"
               disabled={disableSecondary || isLoading}
-              fullWidth={isMobile}
+              fullWidth
+              sx={{ 
+                maxWidth: { sm: 'auto' },
+                width: { xs: '100%', sm: 'auto' },
+              }}
             >
               {secondaryBtnText}
             </Button>
@@ -75,14 +93,18 @@ export default function ModalBase({
             <Button 
               onClick={handlePrimaryAction} 
               variant="contained" 
+              color={primaryBtnColor}
               disabled={isPrimaryDisabled || isLoading}
-              fullWidth={isMobile}
-              startIcon={isLoading ? null : undefined}
+              fullWidth
+              sx={{ 
+                maxWidth: { sm: 'auto' },
+                width: { xs: '100%', sm: 'auto' },
+              }}
             >
               {isLoading ? "Processing..." : primaryBtnText}
             </Button>
           )}
-        </DialogActions>
+        </Box>
       )}
     </Dialog>
   );

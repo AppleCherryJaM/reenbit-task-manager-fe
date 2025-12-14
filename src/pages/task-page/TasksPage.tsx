@@ -13,6 +13,7 @@ import { TaskPageStrings, TaskPriority, TaskStatus } from "./task-page.types";
 import { mapFilterPriorityToApi, mapFilterStatusToApi } from "./task-page.helpers";
 import { useToast } from "@/providers/ToastProvider";
 import type { Task} from "@/types/types";
+import { useConfirmation } from "@/providers/ConfirmationProvider";
 
 export default function TasksPage() {
   const navigate = useNavigate();
@@ -43,6 +44,7 @@ export default function TasksPage() {
     priority: 'all'
   });
 
+  const { showConfirmation } = useConfirmation();
   const createTaskMutation = useCreateTask();
   const updateTaskMutation = useUpdateTask();
   const deleteTaskMutation = useDeleteTask();
@@ -167,15 +169,21 @@ export default function TasksPage() {
     }
   };
 
-  const handleDeleteTask = async (id: string) => {
-    if (window.confirm(TaskPageStrings.DELETE_TASK_CONFIRMATION)) {
-      try {
-        await deleteTaskMutation.mutateAsync(id);
-        showToast(TaskPageStrings.DELETE_TASK_SUCCESS, "success");
-      } catch (_error) {
-        showToast(TaskPageStrings.DELETE_TASK_ERROR, "error");
-      }
-    }
+  const handleDeleteTask = (id: string) => {
+    showConfirmation({
+      title: "Delete Task",
+      message: TaskPageStrings.DELETE_TASK_CONFIRMATION,
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      onConfirm: async () => {
+        try {
+          await deleteTaskMutation.mutateAsync(id);
+          showToast(TaskPageStrings.DELETE_TASK_SUCCESS, "success");
+        } catch (_error) {
+          showToast(TaskPageStrings.DELETE_TASK_ERROR, "error");
+        }
+      },
+    });
   };
 
   const handleEditTask = (task: Task) => {

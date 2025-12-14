@@ -6,6 +6,7 @@ import { BrowserRouter as Router } from "react-router-dom";
 import { theme } from "./providers/theme.provider";
 import MainRouter from "./router/MainRouter";
 import { ToastProvider } from "./providers/ToastProvider";
+import { ConfirmationProvider } from "./providers/ConfirmationProvider";
 
 const queryClient = new QueryClient({
 	defaultOptions: {
@@ -24,7 +25,9 @@ function App() {
 				<CssBaseline />
 				<Router>
 					<ToastProvider>
-						<MainRouter />
+						<ConfirmationProvider>
+							<MainRouter />
+						</ConfirmationProvider>
 					</ToastProvider>
 				</Router>
 			</ThemeProvider>
