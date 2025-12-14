@@ -42,7 +42,6 @@ export default function TaskTable({
       boxShadow: 1,
       display: "flex",
       flexDirection: "column",
-      // Гарантируем минимальную высоту даже при пустых данных
       minHeight: isMobile ? 350 : 450,
     }}>
 
@@ -58,7 +57,6 @@ export default function TaskTable({
         onFilterChange={onFilterChange}
       />
 
-      {/* Адаптивная высота: гибкая, но с min */}
       <Box sx={{ 
         flex: 1, 
         minHeight: isMobile ? 200 : 300, 
@@ -81,7 +79,7 @@ export default function TaskTable({
             border: "none",
             height: '100%',
             '& .MuiDataGrid-main': {
-              overflow: 'auto', // гарантирует горизонтальный скролл на мобилках
+              overflow: 'auto',
             },
             "& .MuiDataGrid-columnHeaders": {
               backgroundColor: "#F3F4F6",
@@ -100,7 +98,6 @@ export default function TaskTable({
                 backgroundColor: 'rgba(0, 0, 0, 0.04)',
               }
             },
-            // Убираем лишние тени и разделители
             "& .MuiDataGrid-cell:focus, & .MuiDataGrid-cell:focus-within": {
               outline: 'none',
             },

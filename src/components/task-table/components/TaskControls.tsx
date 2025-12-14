@@ -74,7 +74,6 @@ export function TaskControls({
 
   return (
     <>
-      {/* Адаптивная обёртка для сортировки и фильтров */}
       <Box
         sx={{
           display: 'flex',
@@ -87,7 +86,6 @@ export function TaskControls({
           borderColor: 'divider',
         }}
       >
-        {/* Блок сортировки */}
         <Stack direction="row" spacing={1} alignItems="center">
           <Typography variant="body2" color="text.secondary">
             Sort by:
@@ -140,7 +138,6 @@ export function TaskControls({
           </IconButton>
         </Stack>
 
-        {/* Блок фильтров */}
         <Stack
           direction={isMobile ? "column" : "row"}
           spacing={isMobile ? 1 : 1}
@@ -216,7 +213,6 @@ export function TaskControls({
         </Stack>
       </Box>
 
-      {/* Чипы активных фильтров */}
       {hasActiveFilters && (
         <Stack direction="row" spacing={1} sx={{ mb: 2, flexWrap: 'wrap' }}>
           {currentFilters.status !== 'all' && (

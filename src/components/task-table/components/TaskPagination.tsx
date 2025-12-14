@@ -37,7 +37,6 @@ export function TaskPagination({
         borderColor: 'divider' 
       }}
     >
-      {/* Левая часть: показ и размер страницы */}
       <Stack 
         direction={isMobile ? "column" : "row"} 
         spacing={isMobile ? 0.5 : 2} 
@@ -75,7 +74,6 @@ export function TaskPagination({
         </Stack>
       </Stack>
 
-      {/* Центр: пагинация */}
       <Pagination
         count={totalPages}
         page={currentPage + 1}
@@ -92,7 +90,6 @@ export function TaskPagination({
         }}
       />
 
-      {/* Правая часть: номер страницы */}
       {!isMobile && (
         <Typography variant="body2" color="text.secondary">
           Page {currentPage + 1} of {totalPages || 1}

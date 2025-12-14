@@ -41,12 +41,10 @@ export function TaskFilters({
 			alignItems={isMobile ? "stretch" : "center"}
 			sx={{ width: '100%' }}
 		>
-			{/* Иконка фильтра — только на десктопе */}
 			{!isMobile && (
 				<FilterListIcon sx={{ color: "action.active", fontSize: 20, mt: 0.75 }} />
 			)}
 
-			{/* Селект статуса — всегда fullWidth на мобилках */}
 			<FormControl size="small" fullWidth>
 				<Select
 					value={status}
@@ -73,7 +71,6 @@ export function TaskFilters({
 				</Select>
 			</FormControl>
 
-			{/* Селект приоритета — всегда fullWidth на мобилках */}
 			<FormControl size="small" fullWidth>
 				<Select
 					value={priority}
@@ -100,7 +97,6 @@ export function TaskFilters({
 				</Select>
 			</FormControl>
 
-			{/* Кнопка "Clear" — компактная и только если есть активные фильтры */}
 			{hasActiveFilters && (
 				<Button
 					size="small"
@@ -111,7 +107,6 @@ export function TaskFilters({
 						height: 32,
 						whiteSpace: 'nowrap',
 						mt: isMobile ? 0 : 0,
-						// На мобилках — компактнее
 						...isMobile && {
 							minWidth: 'auto',
 							px: 0.5,
