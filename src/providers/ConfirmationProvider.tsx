@@ -1,56 +1,48 @@
-import {
-  createContext,
-  type ReactNode,
-  useContext,
-  useState,
-  useCallback,
-} from "react";
-import ModalBase from "@/components/modal/ModalBase"; // ← твой ModalBase
 import { Typography } from "@mui/material";
+import { createContext, type ReactNode, useCallback, useContext, useState } from "react";
+import ModalBase from "@/components/modal/ModalBase";
 
 interface ConfirmationOptions {
-  title?: string;
-  message: string;
-  confirmText?: string;
-  cancelText?: string;
-  onConfirm: () => void;
-  onCancel?: () => void;
-  isLoading?: boolean;
+	title?: string;
+	message: string;
+	confirmText?: string;
+	cancelText?: string;
+	onConfirm: () => void;
+	onCancel?: () => void;
+	isLoading?: boolean;
 }
 
 interface ConfirmationContextValue {
-  showConfirmation: (options: ConfirmationOptions) => void;
+	showConfirmation: (options: ConfirmationOptions) => void;
 }
 
-const ConfirmationContext = createContext<ConfirmationContextValue | undefined>(
-  undefined
-);
+const ConfirmationContext = createContext<ConfirmationContextValue | undefined>(undefined);
 
 export const ConfirmationProvider = ({ children }: { children: ReactNode }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [options, setOptions] = useState<ConfirmationOptions>({
-    message: "",
-    onConfirm: () => {},
-  });
+	const [isOpen, setIsOpen] = useState(false);
+	const [options, setOptions] = useState<ConfirmationOptions>({
+		message: "",
+		onConfirm: () => {},
+	});
 
-  const showConfirmation = useCallback((opts: ConfirmationOptions) => {
-    setOptions(opts);
-    setIsOpen(true);
-  }, []);
+	const showConfirmation = useCallback((opts: ConfirmationOptions) => {
+		setOptions(opts);
+		setIsOpen(true);
+	}, []);
 
-  const handleClose = () => {
-    setIsOpen(false);
-    options.onCancel?.();
-  };
+	const handleClose = () => {
+		setIsOpen(false);
+		options.onCancel?.();
+	};
 
-  const handleConfirm = () => {
-    options.onConfirm();
-  };
+	const handleConfirm = () => {
+		options.onConfirm();
+	};
 
-  return (
-    <ConfirmationContext.Provider value={{ showConfirmation }}>
-      {children}
-      <ModalBase
+	return (
+		<ConfirmationContext.Provider value={{ showConfirmation }}>
+			{children}
+			<ModalBase
 				open={isOpen}
 				title={options.title || "Confirm Action"}
 				onClose={handleClose}
@@ -58,25 +50,23 @@ export const ConfirmationProvider = ({ children }: { children: ReactNode }) => {
 				secondaryBtnText={options.cancelText || "Cancel"}
 				onPrimaryAction={handleConfirm}
 				onSecondaryAction={handleClose}
-				primaryBtnColor="error"        
-				secondaryBtnColor="primary"    
+				primaryBtnColor="error"
+				secondaryBtnColor="primary"
 				isLoading={options.isLoading || false}
 				maxWidth="xs"
 			>
-        <Typography variant="body1" color="text.secondary">
-          {options.message}
-        </Typography>
-      </ModalBase>
-    </ConfirmationContext.Provider>
-  );
+				<Typography variant="body1" color="text.secondary">
+					{options.message}
+				</Typography>
+			</ModalBase>
+		</ConfirmationContext.Provider>
+	);
 };
 
 export const useConfirmation = () => {
-  const context = useContext(ConfirmationContext);
-  if (!context) {
-    throw new Error(
-      "useConfirmation must be used inside ConfirmationProvider"
-    );
-  }
-  return context;
+	const context = useContext(ConfirmationContext);
+	if (!context) {
+		throw new Error("useConfirmation must be used inside ConfirmationProvider");
+	}
+	return context;
 };

@@ -1,209 +1,232 @@
-import { useCallback, useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { Alert, Box, Button, CircularProgress, Snackbar } from "@mui/material";
 import AppHeader from "@components/header/AppHeader";
 import TaskTable from "@components/task-table/TaskTable";
+import { Alert, Box, Button, CircularProgress } from "@mui/material";
+import { useCallback, useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import CreateTaskModal from "@/components/modal/CreateTaskModal";
 import EditTaskModal from "@/components/modal/EditTaskModal";
 import { useCreateTask, useDeleteTask, useTasks, useUpdateTask } from "@/hooks/api/use-tasks";
+import { useToast } from "@/providers/ToastProvider";
 import { authService } from "@/services/auth.service";
 import { useAuthStore } from "@/store/auth.store";
 import { useModalStore } from "@/store/modal.store";
-import { TaskPageStrings, TaskPriority, TaskStatus } from "./task-page.types";
+import type { Task } from "@/types/types";
 import { mapFilterPriorityToApi, mapFilterStatusToApi } from "./task-page.helpers";
-import { useToast } from "@/providers/ToastProvider";
-import type { Task} from "@/types/types";
+import { TaskPageStrings } from "./task-page.types";
 
 export default function TasksPage() {
-  const navigate = useNavigate();
+	const navigate = useNavigate();
 	const location = useLocation();
 
-  const { openCreateTaskModal, openEditTaskModal } = useModalStore();
-  const { getCurrentUserId, logout: logoutFromStore } = useAuthStore();
-  const { showToast } = useToast();
+	const { openCreateTaskModal, openEditTaskModal } = useModalStore();
+	const { getCurrentUserId, logout: logoutFromStore } = useAuthStore();
+	const { showToast } = useToast();
 
 	const [paginationState, setPaginationState] = useState({
-    page: 0,
-    pageSize: 10,
-  });
+		page: 0,
+		pageSize: 10,
+	});
 
-  const [sortState, setSortState] = useState<{
-    field: string;
-    direction: 'asc' | 'desc';
-  }>({
-    field: 'createdAt',
-    direction: 'desc'
-  });
+	const [sortState, setSortState] = useState<{
+		field: string;
+		direction: "asc" | "desc";
+	}>({
+		field: "createdAt",
+		direction: "desc",
+	});
 
-  const [filterState, setFilterState] = useState<{
-    status: string;
-    priority: string;
-  }>({
-    status: 'all',
-    priority: 'all'
-  });
+	const [filterState, setFilterState] = useState<{
+		status: string;
+		priority: string;
+	}>({
+		status: "all",
+		priority: "all",
+	});
 
-  const createTaskMutation = useCreateTask();
-  const updateTaskMutation = useUpdateTask();
-  const deleteTaskMutation = useDeleteTask();
+	const createTaskMutation = useCreateTask();
+	const updateTaskMutation = useUpdateTask();
+	const deleteTaskMutation = useDeleteTask();
 
-  const currentUserId = getCurrentUserId();
+	const currentUserId = getCurrentUserId();
 
 	useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
+		const searchParams = new URLSearchParams(location.search);
 
-    const statusFromUrl = searchParams.get('status') || 'all';
-    const priorityFromUrl = searchParams.get('priority') || 'all';
-    const pageFromUrl = parseInt(searchParams.get('page') || '0');
-    const sortFieldFromUrl = searchParams.get('sortField') || 'createdAt';
-    const sortDirectionFromUrl = (searchParams.get('sortDirection') || 'desc') as 'asc' | 'desc';
+		const statusFromUrl = searchParams.get("status") || "all";
+		const priorityFromUrl = searchParams.get("priority") || "all";
+		const pageFromUrl = parseInt(searchParams.get("page") || "0");
+		const sortFieldFromUrl = searchParams.get("sortField") || "createdAt";
+		const sortDirectionFromUrl = (searchParams.get("sortDirection") || "desc") as "asc" | "desc";
 
-    setFilterState({
-      status: statusFromUrl,
-      priority: priorityFromUrl
-    });
-    
-    setPaginationState({
-      page: pageFromUrl,
-      pageSize: 10
-    });
-    
-    setSortState({
-      field: sortFieldFromUrl,
-      direction: sortDirectionFromUrl
-    });
-  }, [location.search])
+		setFilterState({
+			status: statusFromUrl,
+			priority: priorityFromUrl,
+		});
 
-	const { 
-    data: response, 
-    isLoading, 
-    error, 
-    refetch 
-  } = useTasks({
-    page: paginationState.page + 1,
-    limit: paginationState.pageSize,
-    sortBy: sortState.field,
-    sortDirection: sortState.direction,
-    status: mapFilterStatusToApi(filterState.status),
-    priority: mapFilterPriorityToApi(filterState.priority),
-  });
+		setPaginationState({
+			page: pageFromUrl,
+			pageSize: 10,
+		});
 
-	const updateUrl = useCallback((filters: any, pagination: any, sort: any) => {
-    const searchParams = new URLSearchParams();
+		setSortState({
+			field: sortFieldFromUrl,
+			direction: sortDirectionFromUrl,
+		});
+	}, [location.search]);
 
-    if (filters.status !== 'all') {
-      searchParams.set('status', filters.status);
-    }
-    
-    if (filters.priority !== 'all') {
-      searchParams.set('priority', filters.priority);
-    }
-    
-    if (pagination.page > 0) {
-      searchParams.set('page', pagination.page.toString());
-    }
-    
-    if (sort.field !== 'createdAt') {
-      searchParams.set('sortField', sort.field);
-    }
-    
-    if (sort.direction !== 'desc') {
-      searchParams.set('sortDirection', sort.direction);
-    }
+	const {
+		data: response,
+		isLoading,
+		error,
+		refetch,
+	} = useTasks({
+		page: paginationState.page + 1,
+		limit: paginationState.pageSize,
+		sortBy: sortState.field,
+		sortDirection: sortState.direction,
+		status: mapFilterStatusToApi(filterState.status),
+		priority: mapFilterPriorityToApi(filterState.priority),
+	});
 
-    navigate({
-      pathname: location.pathname,
-      search: searchParams.toString()
-    }, { replace: true });
-  }, [navigate, location.pathname]);
+	const updateUrl = useCallback(
+		(filters: any, pagination: any, sort: any) => {
+			const searchParams = new URLSearchParams();
 
+			if (filters.status !== "all") {
+				searchParams.set("status", filters.status);
+			}
 
-  const handlePageSizeChange = useCallback((pageSize: number) => {
-    setPaginationState({ page: 0, pageSize });
-  }, []);
+			if (filters.priority !== "all") {
+				searchParams.set("priority", filters.priority);
+			}
 
-  const handleSortChange = useCallback((field: string, direction: 'asc' | 'desc') => {
-    const newSort = { field, direction };
-    setSortState(newSort);
-    updateUrl(filterState, paginationState, newSort);
-    refetch();
-  }, [filterState, paginationState, updateUrl, refetch]);
+			if (pagination.page > 0) {
+				searchParams.set("page", pagination.page.toString());
+			}
 
-	const handlePageChange = useCallback((page: number) => {
-    const newPagination = { ...paginationState, page };
-    setPaginationState(newPagination);
-    updateUrl(filterState, newPagination, sortState);
-  }, [filterState, paginationState, sortState, updateUrl]);
+			if (sort.field !== "createdAt") {
+				searchParams.set("sortField", sort.field);
+			}
 
-  const handleFilterChange = useCallback((key: string, value: string) => {
-    const newFilters = { ...filterState, [key]: value };
-    setFilterState(newFilters);
-    updateUrl(newFilters, paginationState, sortState);
-    refetch();
-  }, [filterState, paginationState, sortState, updateUrl, refetch]);
+			if (sort.direction !== "desc") {
+				searchParams.set("sortDirection", sort.direction);
+			}
 
-  const handleCreateTask = async (taskData: any) => {
-    try {
+			navigate(
+				{
+					pathname: location.pathname,
+					search: searchParams.toString(),
+				},
+				{ replace: true }
+			);
+		},
+		[navigate, location.pathname]
+	);
 
-      if (!currentUserId) {throw new Error("User ID required");}
-      
-      await createTaskMutation.mutateAsync({
-        ...taskData,
-        authorId: currentUserId,
-      });
-      showToast(TaskPageStrings.CREATE_TASK_SUCCESS, "success");
-    } catch (_error) {
-      showToast(TaskPageStrings.CREATE_TASK_ERROR, "error");
-    }
-  };
+	const handlePageSizeChange = useCallback((pageSize: number) => {
+		setPaginationState({ page: 0, pageSize });
+	}, []);
 
-  const handleUpdateTask = async (taskData: any) => {
-    try {
-      const { id, ...data } = taskData;
-      await updateTaskMutation.mutateAsync({ id, data });
-      showToast(TaskPageStrings.UPDATE_TASK_SUCCESS, "success");
-    } catch (_error) {
-      showToast(TaskPageStrings.UPDATE_TASK_ERROR, "error");
-    }
-  };
+	const handleSortChange = useCallback(
+		(field: string, direction: "asc" | "desc") => {
+			const newSort = { field, direction };
+			setSortState(newSort);
+			updateUrl(filterState, paginationState, newSort);
+			refetch();
+		},
+		[filterState, paginationState, updateUrl, refetch]
+	);
 
-  const handleDeleteTask = async (id: string) => {
-    if (window.confirm(TaskPageStrings.DELETE_TASK_CONFIRMATION)) {
-      try {
-        await deleteTaskMutation.mutateAsync(id);
-        showToast(TaskPageStrings.DELETE_TASK_SUCCESS, "success");
-      } catch (_error) {
-        showToast(TaskPageStrings.DELETE_TASK_ERROR, "error");
-      }
-    }
-  };
+	const handlePageChange = useCallback(
+		(page: number) => {
+			const newPagination = { ...paginationState, page };
+			setPaginationState(newPagination);
+			updateUrl(filterState, newPagination, sortState);
+		},
+		[filterState, paginationState, sortState, updateUrl]
+	);
 
-  const handleEditTask = (task: Task) => {
-    openEditTaskModal(task);
-  };
+	const handleFilterChange = useCallback(
+		(key: string, value: string) => {
+			const newFilters = { ...filterState, [key]: value };
+			setFilterState(newFilters);
+			updateUrl(newFilters, paginationState, sortState);
+			refetch();
+		},
+		[filterState, paginationState, sortState, updateUrl, refetch]
+	);
 
-  const handleRetry = () => refetch();
+	const handleCreateTask = async (taskData: any) => {
+		try {
+			if (!currentUserId) {
+				throw new Error("User ID required");
+			}
 
-  const handleLogout = async () => {
-    try {
-      await authService.logout();
-    } catch (error) {
-      console.error("Logout failed:", error);
-    } finally {
-      logoutFromStore();
-      navigate("/auth");
-    }
-  };
+			await createTaskMutation.mutateAsync({
+				...taskData,
+				authorId: currentUserId,
+			});
+			showToast(TaskPageStrings.CREATE_TASK_SUCCESS, "success");
+		} catch (_error) {
+			showToast(TaskPageStrings.CREATE_TASK_ERROR, "error");
+		}
+	};
 
-  if (isLoading) {
-    return (
-      <Box sx={{ p: 3, display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
+	const handleUpdateTask = async (taskData: any) => {
+		try {
+			const { id, ...data } = taskData;
+			await updateTaskMutation.mutateAsync({ id, data });
+			showToast(TaskPageStrings.UPDATE_TASK_SUCCESS, "success");
+		} catch (_error) {
+			showToast(TaskPageStrings.UPDATE_TASK_ERROR, "error");
+		}
+	};
 
-  if (error) {
+	const handleDeleteTask = async (id: string) => {
+		if (window.confirm(TaskPageStrings.DELETE_TASK_CONFIRMATION)) {
+			try {
+				await deleteTaskMutation.mutateAsync(id);
+				showToast(TaskPageStrings.DELETE_TASK_SUCCESS, "success");
+			} catch (_error) {
+				showToast(TaskPageStrings.DELETE_TASK_ERROR, "error");
+			}
+		}
+	};
+
+	const handleEditTask = (task: Task) => {
+		openEditTaskModal(task);
+	};
+
+	const handleRetry = () => refetch();
+
+	const handleLogout = async () => {
+		try {
+			await authService.logout();
+		} catch (error) {
+			console.error("Logout failed:", error);
+		} finally {
+			logoutFromStore();
+			navigate("/auth");
+		}
+	};
+
+	if (isLoading) {
+		return (
+			<Box
+				sx={{
+					p: 3,
+					display: "flex",
+					justifyContent: "center",
+					alignItems: "center",
+					height: "100vh",
+				}}
+			>
+				<CircularProgress />
+			</Box>
+		);
+	}
+
+	if (error) {
 		return (
 			<Box sx={{ p: 3 }}>
 				<AppHeader onLogout={handleLogout} />
@@ -230,42 +253,33 @@ export default function TasksPage() {
 		);
 	}
 
-  const tasks = response?.tasks || [];
-  const pagination = response?.pagination;
+	const tasks = response?.tasks || [];
+	const pagination = response?.pagination;
 
-  return (
-    <Box sx={{ p: 3 }}>
-      <AppHeader onLogout={handleLogout} />
-      
-      <TaskTable
-        rows={tasks}
-        totalCount={pagination?.total || 0}
-        onAddTask={openCreateTaskModal}
-        onEditTask={handleEditTask}
-        onDeleteTask={handleDeleteTask}
-        loading={deleteTaskMutation.isPending}
+	return (
+		<Box sx={{ p: 3 }}>
+			<AppHeader onLogout={handleLogout} />
 
-        onPageChange={handlePageChange}
-        onPageSizeChange={handlePageSizeChange}
-        currentPage={paginationState.page}
-        pageSize={paginationState.pageSize}
+			<TaskTable
+				rows={tasks}
+				totalCount={pagination?.total || 0}
+				onAddTask={openCreateTaskModal}
+				onEditTask={handleEditTask}
+				onDeleteTask={handleDeleteTask}
+				loading={deleteTaskMutation.isPending}
+				onPageChange={handlePageChange}
+				onPageSizeChange={handlePageSizeChange}
+				currentPage={paginationState.page}
+				pageSize={paginationState.pageSize}
+				onSortChange={handleSortChange}
+				currentSort={sortState}
+				onFilterChange={handleFilterChange}
+				currentFilters={filterState}
+			/>
 
-        onSortChange={handleSortChange}
-        currentSort={sortState}
-        
-        onFilterChange={handleFilterChange}
-        currentFilters={filterState}
-      />
+			<CreateTaskModal onCreateTask={handleCreateTask} currentUserId={currentUserId || ""} />
 
-      <CreateTaskModal 
-        onCreateTask={handleCreateTask} 
-        currentUserId={currentUserId || ""} 
-      />
-
-      <EditTaskModal 
-        onUpdateTask={handleUpdateTask} 
-        currentUserId={currentUserId || ""} 
-      />
-    </Box>
-  );
+			<EditTaskModal onUpdateTask={handleUpdateTask} currentUserId={currentUserId || ""} />
+		</Box>
+	);
 }

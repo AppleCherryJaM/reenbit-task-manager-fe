@@ -11,8 +11,8 @@ import {
 	OutlinedInput,
 	Select,
 	Typography,
-	useTheme,
 	useMediaQuery,
+	useTheme,
 } from "@mui/material";
 import type { SelectChangeEvent } from "@mui/material/Select";
 import type { FormMultiSelectProps } from "./forms.types";
@@ -34,7 +34,7 @@ export const FormMultiSelect = <K extends string>({
 	disabled,
 }: FormMultiSelectProps<K>) => {
 	const theme = useTheme();
-	const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+	const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
 	const handleChange = (event: SelectChangeEvent<string[]>): void => {
 		const {
@@ -74,22 +74,18 @@ export const FormMultiSelect = <K extends string>({
 		}
 
 		return availableUsers.map((user) => (
-			<MenuItem 
-				key={user.id} 
+			<MenuItem
+				key={user.id}
 				value={user.id}
-				sx={{ 
+				sx={{
 					minHeight: ITEM_HEIGHT,
 					px: isMobile ? 1.5 : 2,
 				}}
 			>
-				<Checkbox 
-					checked={value.includes(user.id)} 
-					disabled={disabled} 
-					sx={{ p: 0.5 }} 
-				/>
-				<ListItemText 
-					primary={user.name || user.email} 
-					secondary={user.name ? user.email : ""} 
+				<Checkbox checked={value.includes(user.id)} disabled={disabled} sx={{ p: 0.5 }} />
+				<ListItemText
+					primary={user.name || user.email}
+					secondary={user.name ? user.email : ""}
 					primaryTypographyProps={{ variant: "body2" }}
 					secondaryTypographyProps={{ variant: "caption" }}
 				/>
@@ -106,12 +102,14 @@ export const FormMultiSelect = <K extends string>({
 				onChange={handleChange}
 				input={<OutlinedInput label={label} />}
 				renderValue={(selected) => (
-					<Box sx={{ 
-						display: "flex", 
-						flexWrap: "wrap", 
-						gap: 0.5,
-						minHeight: '2.5rem',
-					}}>
+					<Box
+						sx={{
+							display: "flex",
+							flexWrap: "wrap",
+							gap: 0.5,
+							minHeight: "2.5rem",
+						}}
+					>
 						{selected.map((userId) => {
 							const user = users.find((u) => u.id === userId);
 							return (
@@ -121,8 +119,8 @@ export const FormMultiSelect = <K extends string>({
 									size="small"
 									onDelete={disabled ? undefined : () => handleDeleteChip(userId)}
 									onMouseDown={(e) => e.stopPropagation()}
-									sx={{ 
-										maxWidth: '100%',
+									sx={{
+										maxWidth: "100%",
 									}}
 								/>
 							);
@@ -133,12 +131,12 @@ export const FormMultiSelect = <K extends string>({
 					PaperProps: {
 						style: {
 							maxHeight: MENU_HEIGHT,
-							width: isMobile ? '100vw' : 250,
+							width: isMobile ? "100vw" : 250,
 						},
 						sx: {
 							ml: isMobile ? -2 : 0,
 							mr: isMobile ? -2 : 0,
-							minWidth: isMobile ? 'auto' : 250,
+							minWidth: isMobile ? "auto" : 250,
 						},
 					},
 					anchorOrigin: {
@@ -155,9 +153,7 @@ export const FormMultiSelect = <K extends string>({
 			>
 				{renderContent()}
 			</Select>
-			<FormHelperText error={!!error}>
-				{error || helperText || " "}
-			</FormHelperText>
+			<FormHelperText error={!!error}>{error || helperText || " "}</FormHelperText>
 		</FormControl>
 	);
 };
