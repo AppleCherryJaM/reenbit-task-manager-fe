@@ -18,6 +18,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { useBulkCreateTasks } from "@/hooks/useBulkCreateTasks";
 import { CSVImportView } from "@components/task-form/CSVImportView";
 import type { CSVImportViewRef } from "@components/task-form/task-form.utils";
+import { useToast } from "@/providers/ToastProvider";
 
 interface CreateTaskModalProps {
   onCreateTask: (taskData: any) => Promise<void>;
@@ -33,6 +34,7 @@ export default function CreateTaskModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [csvFileSelected, setCsvFileSelected] = useState(false);
   const csvImportRef = useRef<CSVImportViewRef>(null);
+  const { showToast } = useToast();
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -51,8 +53,10 @@ export default function CreateTaskModal({
       const apiData = transformFormToCreateData(formValues, currentUserId);
       await onCreateTask(apiData);
       closeCreateTaskModal();
+      showToast("Task created successfully", "success");
     } catch (error) {
-      console.error("Failed to create task:", error);
+      const message = error instanceof Error ? error.message : "Failed to create task";
+      showToast(message, "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -142,12 +146,6 @@ export default function CreateTaskModal({
             isSubmitting={isSubmitting}
             showFormActions={false}
           />
-        )}
-
-        {bulkCreateMutation.error && (
-          <Alert severity="error" sx={{ mt: 2 }}>
-            {bulkCreateMutation.error.message}
-          </Alert>
         )}
       </Box>
     </ModalBase>

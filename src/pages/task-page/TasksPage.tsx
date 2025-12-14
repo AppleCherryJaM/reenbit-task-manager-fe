@@ -10,9 +10,9 @@ import { authService } from "@/services/auth.service";
 import { useAuthStore } from "@/store/auth.store";
 import { useModalStore } from "@/store/modal.store";
 import { TaskPageStrings, TaskPriority, TaskStatus } from "./task-page.types";
-import type { Task} from "@/types/types";
 import { mapFilterPriorityToApi, mapFilterStatusToApi } from "./task-page.helpers";
-
+import { useToast } from "@/providers/ToastProvider";
+import type { Task} from "@/types/types";
 
 export default function TasksPage() {
   const navigate = useNavigate();
@@ -20,16 +20,8 @@ export default function TasksPage() {
 
   const { openCreateTaskModal, openEditTaskModal } = useModalStore();
   const { getCurrentUserId, logout: logoutFromStore } = useAuthStore();
+  const { showToast } = useToast();
 
-  const [notification, setNotification] = useState<{
-    open: boolean;
-    message: string;
-    severity: "success" | "error";
-  }>({
-    open: false,
-    message: "",
-    severity: "success",
-  });
 	const [paginationState, setPaginationState] = useState({
     page: 0,
     pageSize: 10,
@@ -159,9 +151,9 @@ export default function TasksPage() {
         ...taskData,
         authorId: currentUserId,
       });
-      showNotification(TaskPageStrings.CREATE_TASK_SUCCESS, "success");
+      showToast(TaskPageStrings.CREATE_TASK_SUCCESS, "success");
     } catch (_error) {
-      showNotification(TaskPageStrings.CREATE_TASK_ERROR, "error");
+      showToast(TaskPageStrings.CREATE_TASK_ERROR, "error");
     }
   };
 
@@ -169,9 +161,9 @@ export default function TasksPage() {
     try {
       const { id, ...data } = taskData;
       await updateTaskMutation.mutateAsync({ id, data });
-      showNotification(TaskPageStrings.UPDATE_TASK_SUCCESS, "success");
+      showToast(TaskPageStrings.UPDATE_TASK_SUCCESS, "success");
     } catch (_error) {
-      showNotification(TaskPageStrings.UPDATE_TASK_ERROR, "error");
+      showToast(TaskPageStrings.UPDATE_TASK_ERROR, "error");
     }
   };
 
@@ -179,23 +171,15 @@ export default function TasksPage() {
     if (window.confirm(TaskPageStrings.DELETE_TASK_CONFIRMATION)) {
       try {
         await deleteTaskMutation.mutateAsync(id);
-        showNotification(TaskPageStrings.DELETE_TASK_SUCCESS, "success");
+        showToast(TaskPageStrings.DELETE_TASK_SUCCESS, "success");
       } catch (_error) {
-        showNotification(TaskPageStrings.DELETE_TASK_ERROR, "error");
+        showToast(TaskPageStrings.DELETE_TASK_ERROR, "error");
       }
     }
   };
 
   const handleEditTask = (task: Task) => {
     openEditTaskModal(task);
-  };
-
-  const showNotification = (message: string, severity: "success" | "error") => {
-    setNotification({ open: true, message, severity });
-  };
-
-  const handleCloseNotification = () => {
-    setNotification(prev => ({ ...prev, open: false }));
   };
 
   const handleRetry = () => refetch();
@@ -281,14 +265,6 @@ export default function TasksPage() {
       <EditTaskModal 
         onUpdateTask={handleUpdateTask} 
         currentUserId={currentUserId || ""} 
-      />
-
-      <Snackbar
-        open={notification.open}
-        autoHideDuration={3000}
-        onClose={handleCloseNotification}
-        message={notification.message}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       />
     </Box>
   );
