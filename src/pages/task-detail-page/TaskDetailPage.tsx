@@ -19,6 +19,8 @@ import { useDeleteTask, useUpdateTask } from "@/hooks/api/use-tasks";
 import { taskService } from "@/services/task-service/task.service";
 import { useModalStore } from "@/store/modal.store";
 import type { Task } from "@/types/types";
+import { useConfirmation } from "@/providers/ConfirmationProvider";
+import { useToast } from "@/providers/ToastProvider";
 
 export default function TaskDetailPage() {
 	const { id } = useParams<{ id: string }>();
@@ -29,6 +31,8 @@ export default function TaskDetailPage() {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
+	const { showToast } = useToast();
+	const { showConfirmation } = useConfirmation();
 	const updateTaskMutation = useUpdateTask();
 	const deleteTaskMutation = useDeleteTask();
 
@@ -57,16 +61,21 @@ export default function TaskDetailPage() {
 		}
 	};
 
-	const handleDelete = async (): Promise<void> => {
-		if (task && window.confirm("Are you sure you want to delete this task?")) {
-			try {
-				await deleteTaskMutation.mutateAsync(task.id);
-				navigate("/tasks");
-			} catch (err) {
-				console.error("Error deleting task:", err);
-				alert("Failed to delete task");
-			}
-		}
+	const handleDelete = async (id: string): Promise<void> => {
+		showConfirmation({
+					title: "Delete Task",
+					message: "Are you sure you want to delete this task?",
+					confirmText: "Delete",
+					cancelText: "Cancel",
+					onConfirm: async () => {
+						try {
+							await deleteTaskMutation.mutateAsync(id);
+							showToast("Task deleted successfully", "success");
+						} catch (_error) {
+							showToast("Failed to delete task", "error");
+						}
+					},
+				});
 	};
 
 	const handleUpdateTask = async (taskData: any): Promise<void> => {
@@ -162,7 +171,7 @@ export default function TaskDetailPage() {
 						</Button>
 						<Button
 							startIcon={<Delete />}
-							onClick={handleDelete}
+							onClick={() => handleDelete(task.id)}
 							variant="outlined"
 							color="error"
 							disabled={deleteTaskMutation.isPending}
