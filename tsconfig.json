@@ -13,11 +13,8 @@
       "@utils/*": ["src/utils/*"],
       "@hooks/*": ["src/hooks/*"],
       "@types/*": ["src/types/*"],
-      // "@assets/*": ["src/assets/*"],
-      // "@styles/*": ["src/styles/*"],
       "@api/*": ["src/api/*"],
       "@store/*": ["src/store/*"]
     },
-    "ignoreDeprecations": "6.0"
   }
 }

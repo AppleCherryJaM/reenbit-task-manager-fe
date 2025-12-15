@@ -34,8 +34,6 @@
       "@types/*": ["src/types/*"],
       "@router/*": ["src/router/*"]
     },
-
-    "ignoreDeprecations": "6.0"
   },
   "include": ["src"]
 }
