@@ -7,7 +7,7 @@ interface ConfirmationOptions {
 	message: string;
 	confirmText?: string;
 	cancelText?: string;
-	onConfirm: () => void;
+	onConfirm: () => Promise<void> | void;
 	onCancel?: () => void;
 	isLoading?: boolean;
 }
@@ -35,9 +35,13 @@ export const ConfirmationProvider = ({ children }: { children: ReactNode }) => {
 		options.onCancel?.();
 	};
 
-	const handleConfirm = () => {
-		options.onConfirm();
-	};
+	const handleConfirm = async () => {
+  try {
+    await Promise.resolve(options.onConfirm());
+  } finally {
+    setIsOpen(false);
+  }
+};
 
 	return (
 		<ConfirmationContext.Provider value={{ showConfirmation }}>
