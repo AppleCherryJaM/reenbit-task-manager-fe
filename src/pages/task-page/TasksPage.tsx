@@ -256,6 +256,7 @@ export default function TasksPage() {
 					onEditTask={handleEditTask}
 					onDeleteTask={handleDeleteTask}
 					loading={false}
+					totalCount={0}
 				/>
 			</Box>
 		);
