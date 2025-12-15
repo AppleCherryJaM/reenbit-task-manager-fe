@@ -21,7 +21,7 @@ export function TaskPagination({
 	const theme = useTheme();
 	const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-	const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {
+	const handlePageChange = (_event: React.ChangeEvent<unknown>, page: number) => {
 		onPageChange?.(page - 1);
 	};
 

@@ -1,7 +1,6 @@
 import ClearIcon from "@mui/icons-material/Clear";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import {
-	Box,
 	Button,
 	FormControl,
 	MenuItem,

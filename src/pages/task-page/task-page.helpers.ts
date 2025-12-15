@@ -1,4 +1,4 @@
-import type { TaskStatus } from "@/types/types";
+import type { TaskPriority, TaskStatus } from "@/types/types";
 
 export const mapFilterStatusToApi = (status: string): TaskStatus | undefined => {
 	if (status === "all") {

@@ -1,4 +1,4 @@
-import type { Task, TaskStatus } from "@/types/types";
+import type { Task, TaskPriority, TaskStatus } from "@/types/types";
 
 export interface CreateTaskData {
 	title: string;

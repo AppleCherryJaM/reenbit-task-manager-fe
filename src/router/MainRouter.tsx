@@ -1,6 +1,6 @@
 import { Box, CircularProgress } from "@mui/material";
 import { Suspense } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { PublicRoute } from "./PublicRoute";
 import { routes } from "./router.config";
