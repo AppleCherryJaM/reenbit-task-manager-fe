@@ -1,10 +1,8 @@
-import { CSVImportView } from "@components/task-form/CSVImportView";
-import TaskForm from "@components/task-form/TaskForm";
-import type { CSVImportViewRef } from "@components/task-form/task-form.utils";
 import AddIcon from "@mui/icons-material/Add";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import TaskForm from "@components/task-form/TaskForm";
+import ModalBase from "./ModalBase";
 import {
-	Alert,
 	Box,
 	FormControlLabel,
 	Switch,
@@ -15,10 +13,11 @@ import {
 import { useRef, useState } from "react";
 import { useBulkCreateTasks } from "@/hooks/useBulkCreateTasks";
 import { useToast } from "@/providers/ToastProvider";
-import type { TaskFormValues } from "@/schemas/task.schema";
 import { useModalStore } from "@/store/modal.store";
+import { CSVImportView } from "@components/task-form/CSVImportView";
 import { transformFormToCreateData } from "@/utils/task-transform.utils";
-import ModalBase from "./ModalBase";
+import type { CSVImportViewRef } from "@components/task-form/task-form.utils";
+import type { TaskFormValues } from "@/schemas/task.schema";
 
 interface CreateTaskModalProps {
 	onCreateTask: (taskData: any) => Promise<void>;

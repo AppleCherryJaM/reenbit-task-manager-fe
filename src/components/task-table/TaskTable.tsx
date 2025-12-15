@@ -4,7 +4,7 @@ import { TaskControls } from "./components/TaskControls";
 import { TaskHeader } from "./components/TaskHeader";
 import { TaskPagination } from "./components/TaskPagination";
 import { columns } from "./TaskTable.config";
-import { type TaskTableProps, TaskTableStrings } from "./TaskTable.types";
+import type { TaskTableProps } from "./TaskTable.types";
 
 export default function TaskTable({
 	rows,

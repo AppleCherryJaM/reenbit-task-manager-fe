@@ -1,3 +1,4 @@
+import type { ButtonProps } from "@mui/material/Button";
 import type { ReactNode } from "react";
 
 export interface ModalBaseProps {
